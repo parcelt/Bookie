@@ -1,9 +1,42 @@
 <ion-view view-title="Home">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="playlist in playlists" href="#/app/home/{{playlist.id}}">
-        {{playlist.title}}
+      <ion-item class="item-avatar">
+        <img src={{user.photoURL}} style="width:40px;height:40px">
+        <h2>
+          <textarea name="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
+        </h2>
       </ion-item>
+      <ion-item class="padding" ng-controller="imageController">
+        <ion-item class="item-icon-left">
+          <i class="icon ion-plus-circled" ng-click="addImage()"></i>
+          Add a photo
+        </ion-item>
+        <br><br>
+        <ion-scroll>
+          <img ng-repeat="image in images" ng-src="{{urlForImage(image)}}" height="200px"/>
+        </ion-scroll>
+      </ion-item>
+      <br>
+      <!--<ion-item class="item-avatar" href="#">-->
+      <!--<img src={{user.photoURL}}>-->
+      <!--<h2>{{user.displayName}}</h2>-->
+      <!--<p></p>-->
+      <!--</ion-item>-->
+      <!--<ion-item class="item-body" href="#">-->
+      <!--<img class="full-image" src="{{user.photoURL}}">-->
+      <!--<p>-->
+      <!--{{postData.message}}-->
+      <!--</p>-->
+      <!--<p>-->
+      <!--<a href="#" class="subdued">4 Buyers</a>-->
+      <!--<a href="#" class="subdued">SOLD</a>-->
+      <!--</p>-->
+      <!--</ion-item>-->
+
+      <!--<ion-item ng-repeat="playlist in playlists" href="#/app/home/{{playlist.id}}">-->
+      <!--{{playlist.title}}-->
+      <!--</ion-item>-->
     </ion-list>
   </ion-content>
 </ion-view>
