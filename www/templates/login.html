@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to Bookie</title>
+</head>
+<body>
+  <ion-header-bar>
+    <h1 class="title">Login</h1>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="doLogin()">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Email</span>
+          <input type="text" ng-model="loginData.email">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Password</span>
+          <input type="password" ng-model="loginData.password">
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">Log In</button>
+        </label>
+      </div>
+    </form>
+    <form ng-submit="createAccount()">
+      <div class="list">
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">Create Account</button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</body>
+</html>
