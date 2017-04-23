@@ -1,0 +1,23 @@
+<ion-view view-title="Chat With {{user}}">
+  <ion-content>
+    <ul>
+      <li class="button button-full" ng-repeat="selectedMessage in chatStream" ng-click="onSelectMessage(selectedMessage)">
+        Name: {{selectedMessage.name}} <br>Received at: {{selectedMessage.time}} <br>{{selectedMessage.content}}</li>
+    </ul>
+    <div class="bottom">
+      <div style="float: left; width: 100%;">
+        <label class="item item-input">
+          <input type="text" name="chatBox" id="chatBox-textarea"
+                 ng-model="$parent.chatBox" placeholder="Send Message">
+        </label>
+      </div>
+    </div>
+    <div class="bottom">
+      <div align="center">
+        <button style="float: none; width: 30%;" class="button button-royal button-large" ng-click="onSend()">
+          Send
+        </button>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

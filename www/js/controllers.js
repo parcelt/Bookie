@@ -1,5 +1,25 @@
 angular.module('bookie.controllers', [])
 
+  // Generic item factory for posts and the like
+  .factory('Item', function() {
+    return function(index, name, time, content) {
+      this.index = index;
+      this.name = name;
+      this.time = time;
+      this.content = content;
+    }
+  })
+
+  // Factory for reviews
+  .factory('Review', function() {
+    return function(index, name, rating, content) {
+      this.index = index;
+      this.name = name;
+      this.rating = rating;
+      this.content = content;
+    }
+  })
+
   .controller('LoginCtrl', function($rootScope, $scope, $ionicViewSwitcher, $ionicModal, $state, $timeout) {
     // Form data for the login modal
     $scope.loginData = {};
@@ -84,6 +104,240 @@ angular.module('bookie.controllers', [])
           console.log(error);
         });
     }
+  })
+
+  .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item) {
+    $scope.chats = {};
+
+    $scope.index_t1 = 0;
+    $scope.name_t1 = "Bill";
+    $scope.time_t1 = "1:24pm";
+    $scope.content_t1 = "I'll meet you there.";
+    $scope.index_t2 = 1;
+    $scope.name_t2 = "John";
+    $scope.time_t2 = "12:07pm";
+    $scope.content_t2 = "I got this thing to get rid of.";
+
+    $scope.init = function() {
+      var chat_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
+      var chat_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
+      $scope.chats[0] = chat_t1;
+      $scope.chats[1] = chat_t2;
+    }
+    $scope.init();
+
+
+    $scope.onSearch = function() {
+
+    }
+
+    $scope.onSelectChat = function(selectedChat) {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.chatUser', {
+        'user': selectedChat.name
+      });
+    }
+  })
+
+  .controller('ChatUserCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams) {
+    $scope.chatStream = {};
+    $scope.user = $stateParams.user;
+
+    // Fill chatStream via Firebase TODO: Firebase
+    $scope.index_t1 = 0;
+    $scope.name_t1 = $scope.user;
+    $scope.time_t1 = "1:24pm";
+    $scope.content_t1 = "I'll meet you there.";
+    $scope.index_t2 = 1;
+    $scope.name_t2 = $scope.user;
+    $scope.time_t2 = "1:20";
+    $scope.content_t2 = "Okay, sounds good.";
+    $scope.index_t3 = 2;
+    $scope.name_t3 = "MY USERNAME HERE";
+    $scope.time_t3 = "12:08";
+    $scope.content_t3 = "Your post. I'll take it. Can you get to that one place at the time and stuff?"
+
+    $scope.init = function() {
+      var chatStream_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
+      var chatStream_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
+      var chatStream_t3 = new Item($scope.index_t3, $scope.name_t3, $scope.time_t3, $scope.content_t3);
+      $scope.chatStream[0] = chatStream_t1;
+      $scope.chatStream[1] = chatStream_t2;
+      $scope.chatStream[2] = chatStream_t3;
+    };
+    $scope.init();
+
+    $scope.onSelectMessage = function(selectedMessage) {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.userProfile', {
+        'user': selectedMessage.name
+      });
+    };
+
+    $scope.onSend = function() {
+      //TODO: Add to top of chatStream
+    }
+  })
+
+  .controller('PostsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item) {
+    $rootScope.myPosts = {};
+
+    $scope.index_t1 = 0;
+    $scope.name_t1 = "MY USERNAME HERE";
+    $scope.time_t1 = "9:45am";
+    $scope.content_t1 = "Also I'm selling this thing.";
+    $scope.index_t2 = 1;
+    $scope.name_t2 = "MY USERNAME HERE";
+    $scope.time_t2 = "9:29am";
+    $scope.content_t2 = "I just super NEED this book out of my sight, please.";
+
+    $scope.init = function() {
+      var post_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
+      var post_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
+      $rootScope.myPosts[0] = post_t1;
+      $rootScope.myPosts[1] = post_t2;
+    }
+    $scope.init();
+
+
+    $scope.onSearch = function() {
+
+    }
+
+    $scope.onSelectPost = function(selectedPost) {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.editPost', {
+        'index': selectedPost.index
+      });
+    }
+  })
+
+  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams) {
+    $scope.post = $rootScope.myPosts[$stateParams.index];
+    $scope.content = $scope.post.content;
+
+    $scope.onSaveChanges = function() {
+      // TODO: Update index to place at top
+      $scope.post.time = 'TIME UPDATED' // TODO: Update time properly
+      $rootScope.myPosts[$stateParams.index] = new Item($scope.post.index, $scope.post.name, $scope.post.time, $scope.content);
+
+      $ionicViewSwitcher.nextDirection('back');
+      $state.go('app.posts');
+    }
+  })
+
+  .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review) {
+    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
+    // works for getting the size of a dictionary.
+    $scope.ratingTotal = 0;
+    $scope.ratingCount = 0;
+    $scope.ratingAve = 0;
+    $scope.name = "MY USERNAME HERE"
+    $scope.bio = "MY BIO HERE"
+    $scope.myReviews = {};
+
+    $scope.index_t1 = 0;
+    $scope.name_t1 = "Bill";
+    $scope.rating_t1 = 5;
+    $scope.content_t1 = "As advertised.";
+    $scope.index_t2 = 1;
+    $scope.name_t2 = "Alice";
+    $scope.rating_t2 = 2;
+    $scope.content_t2 = "It's the book, but like, really bad.";
+
+    $scope.init = function() {
+      var review_t1 = new Review($scope.index_t1, $scope.name_t1, $scope.rating_t1, $scope.content_t1);
+      var review_t2 = new Review($scope.index_t2, $scope.name_t2, $scope.rating_t2, $scope.content_t2);
+
+      $scope.myReviews[0] = review_t1;
+      $scope.ratingTotal += review_t1.rating;
+      $scope.ratingCount++;
+
+      $scope.myReviews[1] = review_t2;
+      $scope.ratingTotal+= review_t2.rating;
+      $scope.ratingCount++;
+
+      $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
+    }
+    $scope.init();
+
+    $scope.onSaveChanges = function() {
+      // TODO: Update user info via Firebase
+    }
+  })
+
+  .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams) {
+    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
+    // works for getting the size of a dictionary.
+    $scope.ratingTotal = 0;
+    $scope.ratingCount = 0;
+    $scope.ratingAve = 0;
+    $scope.name = $stateParams.user;
+    $scope.bio = "USER'S BIO HERE"
+    $scope.userReviews = {};
+
+    $scope.index_t1 = 0;
+    $scope.name_t1 = "Ted";
+    $scope.rating_t1 = 4;
+    $scope.content_t1 = "Pretty good, I guess.";
+    $scope.index_t2 = 1;
+    $scope.name_t2 = "Rachel";
+    $scope.rating_t2 = 0;
+    $scope.content_t2 = "Never showed up and hasn't replied since.";
+
+    $scope.init = function() {
+      var review_t1 = new Review($scope.index_t1, $scope.name_t1, $scope.rating_t1, $scope.content_t1);
+      var review_t2 = new Review($scope.index_t2, $scope.name_t2, $scope.rating_t2, $scope.content_t2);
+
+      $scope.userReviews[0] = review_t1;
+      $scope.ratingTotal += review_t1.rating;
+      $scope.ratingCount++;
+
+      $scope.userReviews[1] = review_t2;
+      $scope.ratingTotal+= review_t2.rating;
+      $scope.ratingCount++;
+
+      $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
+    }
+    $scope.init();
+
+    $scope.onMessage = function() {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.chatUser', {
+        'user': $scope.name
+      });
+    }
+
+    $scope.onLeaveReview = function() {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.review', {
+        'user': $scope.name
+      });
+    }
+  })
+
+  .controller('ReviewCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams) {
+    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
+    // works for getting the size of a dictionary.
+    $scope.name = $stateParams.user;
+    $scope.userReviews = {};
+    $scope.ratingTotal = 0;
+    $scope.ratingCount = 0;
+
+    $scope.init = function() {
+      // TODO: Get user's review list, rating total, and rating count from Firebase
+    };
+    $scope.init();
+
+    $scope.onSubmitReview = function() {
+      var review = new Review($scope.ratingCount+1, 'MY USERNAME HERE', $scope.rating, $scope.reviewContent);
+
+      // TODO: Add review to the user's review list, update rating total, update rating count
+      $ionicViewSwitcher.nextDirection('back');
+      $state.go('app.userProfile', {
+        'user': $scope.name
+      });
+    };
   })
 
   .controller('AppCtrl', function($rootScope, $scope, $ionicModal, $ionicViewSwitcher, $timeout, $state) {
@@ -232,7 +486,4 @@ angular.module('bookie.controllers', [])
       var trueOrigin = cordova.file.dataDirectory + name;
       return trueOrigin;
     }
-  })
-
-  .controller('PlaylistCtrl', function($scope, $stateParams) {
   });

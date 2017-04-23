@@ -42,7 +42,21 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova'])
         url: '/chats',
         views: {
           'menuContent': {
-            templateUrl: 'templates/chats.html'
+            templateUrl: 'templates/chats.html',
+            controller: 'ChatsCtrl'
+          }
+        }
+      })
+
+      .state('app.chatUser', {
+        url: '/chatUser/:user',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/chatUser.html',
+            params: {
+              'user': 'user_placeholder'
+            },
+            controller: 'ChatUserCtrl'
           }
         }
       })
@@ -51,7 +65,57 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova'])
         url: '/posts',
         views: {
           'menuContent': {
-            templateUrl: 'templates/posts.html'
+            templateUrl: 'templates/posts.html',
+            controller: 'PostsCtrl'
+          }
+        }
+      })
+
+      .state('app.editPost', {
+        url: '/editPost/:index',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/editPost.html',
+            params: {
+              'index': 0
+            },
+            controller: 'EditPostCtrl'
+          }
+        }
+      })
+
+      .state('app.myProfile', {
+        url: '/myProfile',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/myProfile.html',
+            controller: "MyProfileCtrl"
+          }
+        }
+      })
+
+      .state('app.userProfile', {
+        url: '/userProfile/:user',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/userProfile.html',
+            params: {
+              'user': 'user_placeholder'
+            },
+            controller: 'UserProfileCtrl'
+          }
+        }
+      })
+
+      .state('app.review', {
+        url: '/review/:user',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/review.html',
+            params: {
+              'user': 'user_placeholder'
+            },
+            controller: 'ReviewCtrl'
           }
         }
       })
@@ -64,22 +128,13 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova'])
           }
         }
       })
+
       .state('app.home', {
         url: '/home',
         views: {
           'menuContent': {
             templateUrl: 'templates/home.html',
             controller: 'HomeCtrl'
-          }
-        }
-      })
-
-      .state('app.single', {
-        url: '/home/:playlistId',
-        views: {
-          'menuContent': {
-            templateUrl: 'templates/playlist.html',
-            controller: 'PlaylistCtrl'
           }
         }
       });
