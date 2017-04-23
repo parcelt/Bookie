@@ -7,3 +7,6 @@ plugins/
 .idea/
 www/lib/cordova/
 www/lib/ngCordova/
+.directory
+.io-config.json
+www/lib/angularfire/.directory
