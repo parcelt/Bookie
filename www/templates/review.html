@@ -1,0 +1,27 @@
+<ion-view view-title="Leave a Review for {{name}}">
+  <ion-content>
+      <div class="bottom">
+        <div style="float: left; width: 100%;">
+          <label class="item item-input">
+            <input type="text" name="rating" id="rating-textarea"
+                   ng-model="$parent.rating" placeholder="Enter a number from 0 to 5">
+          </label>
+        </div>
+      </div>
+      <div class="bottom">
+        <div style="float: left; width: 100%;">
+          <label class="item item-input">
+            <input type="text" name="reviewContent" id="reviewContent-textarea"
+                   ng-model="$parent.reviewContent" placeholder="Enter review content">
+          </label>
+        </div>
+      </div>
+      <div class="bottom">
+        <div align="center">
+          <button style="float: none; width: 30%;" class="button button-royal button-large" ng-click="onSubmitReview()">
+            Submit Review
+          </button>
+        </div>
+      </div>
+  </ion-content>
+</ion-view>
