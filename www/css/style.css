@@ -1,5 +1,5 @@
 textarea {
-  width:200px;
+  width:220px;
   resize:none;
   overflow:hidden;
   font-size:18px;
@@ -8,4 +8,10 @@ textarea {
 }
 i {
   cursor:pointer;
+}
+button.post {
+  float:right;
+  display:block;
+  margin-right:0px;
+  clear:left;
 }

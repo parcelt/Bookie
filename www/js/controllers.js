@@ -1,4 +1,4 @@
-angular.module('bookie.controllers', [])
+angular.module('bookie.controllers', ["firebase"])
 
   .controller('LoginCtrl', function($rootScope, $scope, $ionicViewSwitcher, $ionicModal, $state, $timeout) {
     // Form data for the login modal
@@ -133,16 +133,19 @@ angular.module('bookie.controllers', [])
     };
   })
 
-  .controller('HomeCtrl', function($scope, $stateParams) {
+  .controller('HomeCtrl', function($rootScope, $scope, $stateParams) {
     $scope.user = firebase.auth().currentUser;
+
     $scope.postData = {};
     $scope.doPost = function() {
       console.log('Doing post');
-      firebase.database().ref('user/' + $scope.user.uid + '/public/posts/'
-        + (Math.round(Date.now().getTime()) / 1000).toString()).set({
-        message: $scope.postData.message
-      });
-
+      var postFolder = 'user/' + $scope.user.uid + '/public/posts/'
+        + (Math.round(new Date().getTime()) / 1000).toString();
+      var metadata = {
+        contentType: 'image/jpeg'
+      };
+      firebase.storage().ref(postFolder).putString($scope.postData.message);
+      firebase.storage().ref(postFolder).put($rootScope.images.pop(), metadata);
     };
 
     $('textarea').each(function () {
@@ -153,19 +156,24 @@ angular.module('bookie.controllers', [])
     });
   })
 
-  .controller('imageController', function($scope, $cordovaCamera, $cordovaFile) {
+  .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
     //The scope array is used for our ng-repeat to store the links to the images
-    $scope.images = [];
+    $rootScope.images = [];
 
     $scope.addImage = function() {
       // The options array is passed to the cordovaCamera with specific options.
       // For more options see the official docs for cordova camera.
       var options = {
-        destinationType : 'Camera.DestinationType.FILE_URI',
-        sourceType : 'Camera.PictureSourceType.CAMERA', // Camera.PictureSourceType.PHOTOLIBRARY
-        allowEdit : false,
-        encodingType: 'Camera.EncodingType.JPEG',
-        popoverOptions: 'CameraPopoverOptions',
+        quality: 50,
+        destinationType: navigator.camera.DestinationType.DATA_URL,
+        sourceType: navigator.camera.PictureSourceType.CAMERA,
+        allowEdit: true,
+        encodingType: navigator.camera.EncodingType.JPEG,
+        targetWidth: 100,
+        targetHeight: 100,
+        popoverOptions: navigator.camera.PopoverArrowDirection.ARROW_UP,
+        saveToPhotoAlbum: false,
+        correctOrientation:true
       };
 
       // Call the ngCordova module cordovaCamera we injected to our controller
@@ -204,7 +212,7 @@ angular.module('bookie.controllers', [])
         // Make sure to use the apply() function to update the scope and view!
         function onCopySuccess(entry) {
           $scope.$apply(function () {
-            $scope.images.push(entry.nativeURL);
+            $rootScope.images.push(entry.nativeURL);
           });
         }
 
@@ -225,14 +233,59 @@ angular.module('bookie.controllers', [])
       }, function(err) {
         console.log(err);
       });
-    }
+    };
 
     $scope.urlForImage = function(imageName) {
       var name = imageName.substr(imageName.lastIndexOf('/') + 1);
       var trueOrigin = cordova.file.dataDirectory + name;
       return trueOrigin;
+    };
+
+    $scope.getImage = function() {
+      return $rootScope.images.pop().image;
     }
   })
 
-  .controller('PlaylistCtrl', function($scope, $stateParams) {
-  });
+  // .controller("SecureCtrl", function($rootScope, $scope, $ionicHistory, $firebaseArray, $cordovaCamera) {
+  //
+  //   //$ionicHistory.clearHistory();
+  //
+  //   $rootScope.images = [];
+  //
+  //   // var fbAuth = firebase.auth();
+  //   // $scope.user = firebase.auth().currentUser;
+  //   // if(fbAuth) {
+  //   //   var storageRef = firebase.storage();
+  //   //   var imagesRef = storageRef.ref('user/' + $scope.user.uid + '/public/images');
+  //   //   var syncArray = $firebaseArray(imagesRef);
+  //   //   $scope.images = syncArray;
+  //   // } else {
+  //   //   $state.go("login");
+  //   // }
+  //
+  //   $scope.upload = function() {
+  //     var options = {
+  //       quality : 75,
+  //       destinationType : navigator.camera.DestinationType.DATA_URL,
+  //       sourceType : navigator.camera.PictureSourceType.CAMERA,
+  //       allowEdit : true,
+  //       encodingType: navigator.camera.EncodingType.JPEG,
+  //       popoverOptions: CameraPopoverOptions,
+  //       targetWidth: 500,
+  //       targetHeight: 500,
+  //       saveToPhotoAlbum: false
+  //     };
+  //     $cordovaCamera.getPicture(options).then(function(imageData) {
+  //       $rootScope.images.push({image: imageData}).then(function() {
+  //         alert("Image has been uploaded");
+  //       });
+  //     }, function(error) {
+  //       console.error(error);
+  //     });
+  //   }
+  //
+  // })
+  //
+  // .controller('PlaylistCtrl', function($scope, $stateParams) {
+  // })
+;
