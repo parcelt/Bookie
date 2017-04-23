@@ -153,7 +153,7 @@ angular.module('bookie.controllers', [])
     $scope.time_t2 = "1:20";
     $scope.content_t2 = "Okay, sounds good.";
     $scope.index_t3 = 2;
-    $scope.name_t3 = "MY USERNAME HERE";
+    $scope.name_t3 = firebase.auth().currentUser.displayName;
     $scope.time_t3 = "12:08";
     $scope.content_t3 = "Your post. I'll take it. Can you get to that one place at the time and stuff?"
 
@@ -183,11 +183,11 @@ angular.module('bookie.controllers', [])
     $rootScope.myPosts = {};
 
     $scope.index_t1 = 0;
-    $scope.name_t1 = "MY USERNAME HERE";
+    $scope.name_t1 = firebase.auth().currentUser.displayName;
     $scope.time_t1 = "9:45am";
     $scope.content_t1 = "Also I'm selling this thing.";
     $scope.index_t2 = 1;
-    $scope.name_t2 = "MY USERNAME HERE";
+    $scope.name_t2 = firebase.auth().currentUser.displayName;
     $scope.time_t2 = "9:29am";
     $scope.content_t2 = "I just super NEED this book out of my sight, please.";
 
@@ -331,7 +331,7 @@ angular.module('bookie.controllers', [])
     $scope.init();
 
     $scope.onSubmitReview = function() {
-      var review = new Review($scope.ratingCount+1, 'MY USERNAME HERE', $scope.rating, $scope.reviewContent);
+      var review = new Review($scope.ratingCount+1, firebase.auth().currentUser.displayName, $scope.rating, $scope.reviewContent);
 
       // TODO: Add review to the user's review list, update rating total, update rating count
       $ionicViewSwitcher.nextDirection('back');
