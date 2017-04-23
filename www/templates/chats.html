@@ -1,13 +1,16 @@
 <ion-view view-title="Chats">
   <ion-content>
+
     <div class="bottom">
       <div style="float: left; width: 100%;">
         <label class="item item-input">
+          <i class="icon ion-search placeholder-icon"></i>
           <input type="text" name="search" id="searchChats-textarea"
-                 ng-model="$parent.search" placeholder="search">
+                 ng-model="$parent.search" placeholder="Search">
         </label>
       </div>
     </div>
+
     <ul>
       <li class="button button-full" ng-repeat="selectedChat in chats" ng-click="onSelectChat(selectedChat)">
         Name: {{selectedChat.name}} <br>Posted at: {{selectedChat.time}} <br>Content: {{selectedChat.content}}</li>

@@ -1,13 +1,16 @@
 <ion-view view-title="Posts">
   <ion-content>
+
     <div class="bottom">
       <div style="float: left; width: 100%;">
         <label class="item item-input">
+          <i class="icon ion-search placeholder-icon"></i>
           <input type="text" name="search" id="searchMyPosts-textarea"
-                 ng-model="$parent.search" placeholder="search">
+                 ng-model="$parent.search" placeholder="Search">
         </label>
       </div>
     </div>
+
     <ul>
       <li class="button button-full" ng-repeat="selectedPost in myPosts" ng-click="onSelectPost(selectedPost)">
         Name: {{selectedPost.name}} <br>Posted at: {{selectedPost.time}} <br>Content: {{selectedPost.content}}</li>

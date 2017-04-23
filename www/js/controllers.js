@@ -227,13 +227,14 @@ angular.module('bookie.controllers', [])
   })
 
   .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review) {
+
     // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
     // works for getting the size of a dictionary.
     $scope.ratingTotal = 0;
     $scope.ratingCount = 0;
     $scope.ratingAve = 0;
-    $scope.name = "MY USERNAME HERE"
-    $scope.bio = "MY BIO HERE"
+    $scope.name = $scope.user.displayName;
+    $scope.bio = "ADD BIO HERE"
     $scope.myReviews = {};
 
     $scope.index_t1 = 0;
@@ -348,6 +349,8 @@ angular.module('bookie.controllers', [])
     // listen for the $ionicView.enter event:
     //$scope.$on('$ionicView.enter', function(e) {
     //});
+
+    $scope.user = firebase.auth().currentUser;
 
     // Create the login modal that we will use later
     $ionicModal.fromTemplateUrl('templates/logout.html', {
