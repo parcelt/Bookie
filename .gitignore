@@ -5,4 +5,5 @@ node_modules/
 platforms/
 plugins/
 .idea/
-www/lib/
+www/lib/cordova/
+www/lib/ngCordova/
