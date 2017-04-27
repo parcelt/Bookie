@@ -4,11 +4,9 @@
       <ion-item class="item-avatar" ng-controller="HomeCtrl">
         <img src={{user.photoURL}} style="width:40px;height:40px">
         <h2>
-          <textarea name="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
+          <textarea id="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
         </h2>
-
-          <button class="button button-block button-positive col col-25 post" ng-click="doPost()">Post!</button>
-
+        <button class="button button-block button-positive col col-25 post" ng-click="doPost()">Post!</button>
       </ion-item>
       <ion-item class="padding" ng-controller="ImageCtrl">
         <ion-item class="item-icon-left">
@@ -19,16 +17,16 @@
         <ion-scroll>
           <div class="row" ng-repeat="image in images" ng-if="$index % 4 === 0">
             <div class="col col-25" ng-if="$index < images.length">
-              <img ng-src="data:image/jpeg;base64,{{images[$index].image}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 1 < images.length">
-              <img ng-src="data:image/jpeg;base64,{{images[$index + 1].image}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 1]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 2 < images.length">
-              <img ng-src="data:image/jpeg;base64,{{images[$index + 2].image}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 2]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 3 < images.length">
-              <img ng-src="data:image/jpeg;base64,{{images[$index + 3].image}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 3]}}" width="100%" />
             </div>
           </div>
         </ion-scroll>

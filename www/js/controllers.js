@@ -393,16 +393,40 @@ angular.module('bookie.controllers', ["firebase"])
   .controller('HomeCtrl', function($rootScope, $scope, $stateParams) {
     $scope.user = firebase.auth().currentUser;
 
-    $scope.postData = {};
     $scope.doPost = function() {
-      console.log('Doing post');
-      var postFolder = 'user/' + $scope.user.uid + '/public/posts/'
-        + (Math.round(new Date().getTime()) / 1000).toString();
-      var metadata = {
-        contentType: 'image/jpeg'
-      };
-      firebase.storage().ref(postFolder).putString($scope.postData.message);
-      firebase.storage().ref(postFolder).put($rootScope.images.pop(), metadata);
+      var textarea = document.getElementById("postMessage");
+      var postMessage = textarea.value;
+      if(postMessage !== "") {
+        console.log('Doing post');
+        var postFolder = '/user/' + $scope.user.uid + '/public/posts/'
+          + (Math.round(new Date().getTime()) / 1000).toString();
+        var metadata = {
+          contentType: 'image/png'
+        };
+        firebase.storage().ref(postFolder).child('message.txt').putString(textarea.value) //TODO: Add metadata for date and time
+          .then(function () {
+            console.log("Message successfully stored");
+            textarea.value = "";
+            firebase.storage().ref(postFolder).child('photo.png')
+              .putString($rootScope.images[0], 'base64', { contentType: 'image/png' })
+              .then(function () {
+                alert("Success!");
+                console.log("Photo successfully stored");
+                $rootScope.images = [];
+              })
+              .catch(function (error) {
+                alert(error.message);
+                console.log(error);
+              });
+          })
+          .catch(function (error) {
+            alert(error.message);
+            console.log(error);
+          });
+      }
+      else {
+        alert("Text box must contain input in order to post.");
+      }
     };
 
     $('textarea').each(function () {
@@ -436,9 +460,12 @@ angular.module('bookie.controllers', ["firebase"])
       // Call the ngCordova module cordovaCamera we injected to our controller
       $cordovaCamera.getPicture(options).then(function(imageData) {
 
+        $rootScope.images.push(imageData);
+
         // When the image capture returns data, we pass the information to our success function,
         // which will call some other functions to copy the original image to our app folder.
-        onImageSuccess(imageData);
+
+        //onImageSuccess(imageData);
 
         function onImageSuccess(fileURI) {
           createFileEntry(fileURI);
@@ -502,47 +529,4 @@ angular.module('bookie.controllers', ["firebase"])
       return $rootScope.images.pop().image;
     }
   })
-
-  // .controller("SecureCtrl", function($rootScope, $scope, $ionicHistory, $firebaseArray, $cordovaCamera) {
-  //
-  //   //$ionicHistory.clearHistory();
-  //
-  //   $rootScope.images = [];
-  //
-  //   // var fbAuth = firebase.auth();
-  //   // $scope.user = firebase.auth().currentUser;
-  //   // if(fbAuth) {
-  //   //   var storageRef = firebase.storage();
-  //   //   var imagesRef = storageRef.ref('user/' + $scope.user.uid + '/public/images');
-  //   //   var syncArray = $firebaseArray(imagesRef);
-  //   //   $scope.images = syncArray;
-  //   // } else {
-  //   //   $state.go("login");
-  //   // }
-  //
-  //   $scope.upload = function() {
-  //     var options = {
-  //       quality : 75,
-  //       destinationType : navigator.camera.DestinationType.DATA_URL,
-  //       sourceType : navigator.camera.PictureSourceType.CAMERA,
-  //       allowEdit : true,
-  //       encodingType: navigator.camera.EncodingType.JPEG,
-  //       popoverOptions: CameraPopoverOptions,
-  //       targetWidth: 500,
-  //       targetHeight: 500,
-  //       saveToPhotoAlbum: false
-  //     };
-  //     $cordovaCamera.getPicture(options).then(function(imageData) {
-  //       $rootScope.images.push({image: imageData}).then(function() {
-  //         alert("Image has been uploaded");
-  //       });
-  //     }, function(error) {
-  //       console.error(error);
-  //     });
-  //   }
-  //
-  // })
-  //
-  // .controller('PlaylistCtrl', function($scope, $stateParams) {
-  // })
 ;
