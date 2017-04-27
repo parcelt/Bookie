@@ -10,3 +10,9 @@ www/lib/ngCordova/
 .directory
 .io-config.json
 www/lib/angularfire/.directory
+/.idea/workspace.xml
+/.idea/misc.xml
+/.idea/Bookie.iml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
