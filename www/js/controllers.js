@@ -390,51 +390,90 @@ angular.module('bookie.controllers', ["firebase"])
     };
   })
 
-  .controller('HomeCtrl', function($rootScope, $scope, $state) {
+  .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray) {
     $scope.user = firebase.auth().currentUser;
+
+    var postsRef = firebase.database().ref('/posts/');
+    $scope.postsList = $firebaseArray(postsRef);
 
     $scope.doPost = function() {
       $scope.user = firebase.auth().currentUser;
       var textarea = document.getElementById("postMessage");
       var postMessage = textarea.value;
+      var currentdate = new Date();
+      var datetime = "Last Sync: " + currentdate.getDate() + "/"
+        + (currentdate.getMonth()+1)  + "/"
+        + currentdate.getFullYear() + " @ "
+        + currentdate.getHours() + ":"
+        + currentdate.getMinutes() + ":"
+        + currentdate.getSeconds();
       if(postMessage !== "") {
         console.log('Doing post');
-        var postFolder = '/user/' + $scope.user.uid + '/public/posts/'
-          + (Math.round(new Date().getTime()) / 1000).toString();
-        var i = 0;
-        if($rootScope.images.length > 0) {
-          for(i = 0; i < $rootScope.images.length; i++) {
-            firebase.storage().ref(postFolder).child('photo'+i+'.png')
-              .putString($rootScope.images[i], 'base64', {contentType: 'image/png'})
-              .then(function () {
-                console.log("Photo(s) successfully stored");
-
-              })
-              .catch(function (error) {
-                alert("Oops! There was an problem with your image format, so we could not store it.");
-                console.log(error);
-              });
-          }
-        }
-        if(i === $rootScope.images.length) {
-          $rootScope.images = []; //Reset images array to be empty
-          firebase.storage().ref(postFolder).child('message.txt').putString(textarea.value) //TODO: Add metadata for date and time
-            .then(function () {
-              console.log("Message successfully stored");
-              textarea.value = "";
-              alert("Success!");
-              $state.go($state.current, {}, {reload: true});
-            })
-            .catch(function (error) {
-              alert(error.message);
-              console.log(error);
-            });
-        }
+        var postFolder = '/posts/'
+          + (Math.round(currentdate.getTime() / 1000)).toString();
+        firebase.database().ref(postFolder).set(
+          {
+            uid: $scope.user.uid,
+            displayName: $scope.user.displayName,
+            email: $scope.user.email,
+            photoURL: $scope.user.photoURL,
+            time: currentdate.toLocaleString(),
+            message: postMessage,
+            images: JSON.stringify($rootScope.images)
+          });
+        console.log("Post successfully stored");
+        $rootScope.images = []; //Reset images array to be empty
+        textarea.value = "";
+        alert("Success!");
+        $state.go($state.current, {}, {reload: true});
       }
       else {
         alert("Text box must contain input in order to post.");
       }
     };
+
+    // $scope.doPost = function() {
+    //   $scope.user = firebase.auth().currentUser;
+    //   var textarea = document.getElementById("postMessage");
+    //   var postMessage = textarea.value;
+    //   if(postMessage !== "") {
+    //     console.log('Doing post');
+    //     var postFolder = '/user/' + $scope.user.uid + '/public/posts/'
+    //       + (Math.round(new Date().getTime()) / 1000).toString();
+    //     var i = 0;
+    //     if($rootScope.images.length > 0) {
+    //       for(i = 0; i < $rootScope.images.length; i++) {
+    //         firebase.database().ref(postFolder).child('photo'+i+'.png')
+    //           .putString($rootScope.images[i], 'base64', {contentType: 'image/png'})
+    //           .then(function () {
+    //             console.log("Photo(s) successfully stored");
+    //
+    //           })
+    //           .catch(function (error) {
+    //             alert("Oops! There was an problem with your image format, so we could not store it.");
+    //             console.log(error);
+    //           });
+    //       }
+    //     }
+    //     if(i === $rootScope.images.length) {
+    //       $rootScope.images = []; //Reset images array to be empty
+    //       firebase.storage().ref(postFolder).child('message.txt').putString(textarea.value)
+    //         .then(function () {
+    //           console.log("Message successfully stored");
+    //           textarea.value = "";
+    //           alert("Success!");
+    //           $state.go($state.current, {}, {reload: true});
+    //         })
+    //         .catch(function (error) {
+    //           alert(error.message);
+    //           console.log(error);
+    //         });
+    //     }
+    //   }
+    //   else {
+    //     alert("Text box must contain input in order to post.");
+    //   }
+    // };
 
     $('textarea').each(function () {
       this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
@@ -442,6 +481,8 @@ angular.module('bookie.controllers', ["firebase"])
       this.style.height = 'auto';
       this.style.height = (this.scrollHeight) + 'px';
     });
+
+
   })
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
