@@ -24,9 +24,6 @@ angular.module('bookie.controllers', ["firebase"])
     // Form data for the login modal
     $scope.loginData = {};
 
-    $scope.loginData.email = "zkocken@wisc.edu";
-    $scope.loginData.password = "bookie";
-
     $scope.doLogin = function() {
       firebase.auth().signInWithEmailAndPassword($scope.loginData.email, $scope.loginData.password)
         .then(function() {
@@ -87,8 +84,7 @@ angular.module('bookie.controllers', ["firebase"])
             photoURL: "http://i.ebayimg.com/images/g/aJUAAOSwT6pVw1wO/s-l300.jpg"
           }).then(function() {
             console.log("Update successful");
-            var ref = firebase.database().ref('/user/' + user.uid); //TODO ------------------------------------------------------
-            ref.set(
+            firebase.database().ref('/user/' + user.uid).set(
               {
                 uid: user.uid,
                 displayName: user.displayName,
@@ -98,7 +94,7 @@ angular.module('bookie.controllers', ["firebase"])
             );
 
           }).catch(function(error) {
-            alert(errorMessage);
+            alert(error.message);
             console.log(error);
           })
 
