@@ -32,8 +32,9 @@
         </ion-scroll>
       </ion-item>
       <br>
-      <div class="row" ng-repeat="post in postsList | orderBy:'-'">
-        <ion-item class="item-avatar" href="#">
+      <div ng-repeat="post in postsList">
+        <br>
+        <ion-item class="item-avatar">
           <img src={{post.photoURL}}>
           <h2>{{post.displayName}}</h2>
           <p></p>
@@ -42,18 +43,12 @@
           <p>
             {{post.message}}
           </p>
-          <div ng-repeat="image in post.images">
-            <img class="full-image" src="data:image/png;base64,{{image}}">
+          <div ng-repeat="image in parseJSON(post.images)">
+            <img class="full-image" ng-src="data:image/png;base64,{{image}}" width="100%" />
           </div>
-          <p>
-            <a href="#" class="subdued">4 Buyers</a>
-            <a href="#" class="subdued">SOLD</a>
-          </p>
         </ion-item>
-      </div>
-        <!--<ion-item ng-repeat="playlist in playlists" href="#/app/home/{{playlist.id}}">-->
-          <!--{{playlist.title}}-->
-        <!--</ion-item>-->
+        <br>
+    </div>
     </ion-list>
   </ion-content>
 </ion-view>
