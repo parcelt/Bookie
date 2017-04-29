@@ -35,7 +35,7 @@
       <div ng-repeat="post in postsList | orderBy:'-'">
         <br>
         <ion-item class="item-avatar">
-          <img src={{post.photoURL}}>
+          <img src={{post.photoURL}} />
           <h2>{{post.displayName}}</h2>
           <p>{{post.time}}</p>
         </ion-item>
