@@ -32,7 +32,7 @@
         </ion-scroll>
       </ion-item>
       <br>
-      <div class="row" ng-repeat="post in postsList">
+      <div class="row" ng-repeat="post in postsList | orderBy:'-'">
         <ion-item class="item-avatar" href="#">
           <img src={{post.photoURL}}>
           <h2>{{post.displayName}}</h2>
