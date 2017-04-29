@@ -225,7 +225,7 @@ angular.module('bookie.controllers', ["firebase"])
 
     $scope.onSaveChanges = function() {
       // TODO: Update index to place at top
-      $scope.post.time = 'TIME UPDATED' // TODO: Update time properly
+      $scope.post.time = 'TIME UPDATED'; // TODO: Update time properly
       $rootScope.myPosts[$stateParams.index] = new Item($scope.post.index, $scope.post.name, $scope.post.time, $scope.content);
 
       $ionicViewSwitcher.nextDirection('back');
@@ -266,7 +266,7 @@ angular.module('bookie.controllers', ["firebase"])
       $scope.ratingCount++;
 
       $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
-    }
+    };
     $scope.init();
 
     $scope.onSaveChanges = function() {
@@ -305,7 +305,7 @@ angular.module('bookie.controllers', ["firebase"])
       $scope.ratingCount++;
 
       $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
-    }
+    };
     $scope.init();
 
     $scope.onMessage = function() {
@@ -313,7 +313,7 @@ angular.module('bookie.controllers', ["firebase"])
       $state.go('app.chatUser', {
         'user': $scope.name
       });
-    }
+    };
 
     $scope.onLeaveReview = function() {
       $ionicViewSwitcher.nextDirection('forward');
@@ -541,6 +541,6 @@ angular.module('bookie.controllers', ["firebase"])
 
     $scope.getImage = function() {
       return $rootScope.images.pop().image;
-    }
+    };
   })
 ;
