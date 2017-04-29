@@ -25,7 +25,6 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.loginData = {};
 
     $scope.doLogin = function() {
-      //TODO: Verify via Firebase
       firebase.auth().signInWithEmailAndPassword($scope.loginData.email, $scope.loginData.password)
         .then(function() {
           $ionicViewSwitcher.nextDirection('forward');
@@ -68,7 +67,6 @@ angular.module('bookie.controllers', ["firebase"])
     };
 
     $scope.doCreateAccount = function() {
-      //TODO: Verify via Firebase
       firebase.auth()
         .createUserWithEmailAndPassword($scope.createAccountData.email, $scope.createAccountData.password)
         .then(function() {
@@ -86,6 +84,16 @@ angular.module('bookie.controllers', ["firebase"])
             photoURL: "http://i.ebayimg.com/images/g/aJUAAOSwT6pVw1wO/s-l300.jpg"
           }).then(function() {
             console.log("Update successful");
+            var ref = firebase.database().ref('/user/' + user.uid); //TODO ------------------------------------------------------
+            ref.set(
+              {
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+              }
+            );
+
           }).catch(function(error) {
             alert(errorMessage);
             console.log(error);
@@ -230,11 +238,11 @@ angular.module('bookie.controllers', ["firebase"])
 
     // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
     // works for getting the size of a dictionary.
+
+    $scope.name = $scope.user.displayName;
     $scope.ratingTotal = 0;
     $scope.ratingCount = 0;
     $scope.ratingAve = 0;
-    $scope.name = $scope.user.displayName;
-    $scope.bio = "ADD BIO HERE"
     $scope.myReviews = {};
 
     $scope.index_t1 = 0;
@@ -274,7 +282,6 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.ratingCount = 0;
     $scope.ratingAve = 0;
     $scope.name = $stateParams.user;
-    $scope.bio = "USER'S BIO HERE"
     $scope.userReviews = {};
 
     $scope.index_t1 = 0;
@@ -438,7 +445,7 @@ angular.module('bookie.controllers', ["firebase"])
     //   var postMessage = textarea.value;
     //   if(postMessage !== "") {
     //     console.log('Doing post');
-    //     var postFolder = '/user/' + $scope.user.uid + '/public/posts/'
+    //     var postFolder = '/user/' + $scope.user.uid + '/public/posts/' //TODO ------------------------------------------------
     //       + (Math.round(new Date().getTime()) / 1000).toString();
     //     var i = 0;
     //     if($rootScope.images.length > 0) {
