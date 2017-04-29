@@ -233,80 +233,90 @@ angular.module('bookie.controllers', ["firebase"])
     }
   })
 
-  .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review) {
+  .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $firebaseArray) {
 
     // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
-    // works for getting the size of a dictionary.
+    // works for getting the size of a dictionary. ANSWER: .length
+    $scope.user = firebase.auth().currentUser;
+
+    var reviewsRef = firebase.database().ref('/user/' + $scope.user.uid + '/reviews/');
+    $scope.myReviewsList = $firebaseArray(reviewsRef);
 
     $scope.name = $scope.user.displayName;
-    $scope.ratingTotal = 0;
-    $scope.ratingCount = 0;
+    $scope.ratingTotal = 0.0;
+    $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
-    $scope.myReviews = {};
-
-    $scope.index_t1 = 0;
-    $scope.name_t1 = "Bill";
-    $scope.rating_t1 = 5;
-    $scope.content_t1 = "As advertised.";
-    $scope.index_t2 = 1;
-    $scope.name_t2 = "Alice";
-    $scope.rating_t2 = 2;
-    $scope.content_t2 = "It's the book, but like, really bad.";
 
     $scope.init = function() {
-      var review_t1 = new Review($scope.index_t1, $scope.name_t1, $scope.rating_t1, $scope.content_t1);
-      var review_t2 = new Review($scope.index_t2, $scope.name_t2, $scope.rating_t2, $scope.content_t2);
-
-      $scope.myReviews[0] = review_t1;
-      $scope.ratingTotal += review_t1.rating;
-      $scope.ratingCount++;
-
-      $scope.myReviews[1] = review_t2;
-      $scope.ratingTotal+= review_t2.rating;
-      $scope.ratingCount++;
+      angular.forEach($scope.myReviewsList, function(review) {
+        $scope.ratingTotal += parseFloat(review.rating, 10);
+        $scope.ratingCount++;
+      });
 
       $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
     };
-    $scope.init();
+    $scope.myReviewsList.$loaded()
+      .then(function(){
+        if($scope.myReviewsList.length) $scope.init();
+      });
 
     $scope.onSaveChanges = function() {
       // TODO: Update user info via Firebase
     }
+
+//    $scope.user = firebase.auth().currentUser;
+//
+//    var ref = firebase.database().ref('/user/' + user.uid)
+//    ref.once("value")
+//      .then(function(snapshot) {
+//        var hasName = snapshot.hasChild("reviews"); // true
+//    });
+//
+//    if (hasName){
+//       var reviewsRef = firebase.database().ref('/user/reviews');
+//       $scope.myReviewsList = $firebaseArray(reviewsRef);
+//    }
+
+    $scope.goToUser = function(review) {
+      $ionicViewSwitcher.nextDirection('forward');
+      $state.go('app.userProfile', {
+        'uid': review.uid,
+        'displayName': review.displayName,
+        'email': review.email,
+        'photoURL': review.photoURL
+      });
+    }
+
   })
 
-  .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams) {
+  .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams, $firebaseArray) {
     // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
     // works for getting the size of a dictionary.
-    $scope.ratingTotal = 0;
-    $scope.ratingCount = 0;
-    $scope.ratingAve = 0;
-    $scope.name = $stateParams.user;
-    $scope.userReviews = {};
+    $scope.user = firebase.auth().currentUser;
 
-    $scope.index_t1 = 0;
-    $scope.name_t1 = "Ted";
-    $scope.rating_t1 = 4;
-    $scope.content_t1 = "Pretty good, I guess.";
-    $scope.index_t2 = 1;
-    $scope.name_t2 = "Rachel";
-    $scope.rating_t2 = 0;
-    $scope.content_t2 = "Never showed up and hasn't replied since.";
+    var reviewsRef = firebase.database().ref('/user/' + $stateParams.uid + '/reviews/');
+    $scope.userReviewsList = $firebaseArray(reviewsRef);
+
+    $scope.uid = $stateParams.uid;
+    $scope.displayName = $stateParams.displayName;
+    $scope.email = $stateParams.email;
+    $scope.photoURL = $stateParams.photoURL;
+    $scope.ratingTotal = 0.0;
+    $scope.ratingCount = 0.0;
+    $scope.ratingAve = 0;
 
     $scope.init = function() {
-      var review_t1 = new Review($scope.index_t1, $scope.name_t1, $scope.rating_t1, $scope.content_t1);
-      var review_t2 = new Review($scope.index_t2, $scope.name_t2, $scope.rating_t2, $scope.content_t2);
-
-      $scope.userReviews[0] = review_t1;
-      $scope.ratingTotal += review_t1.rating;
-      $scope.ratingCount++;
-
-      $scope.userReviews[1] = review_t2;
-      $scope.ratingTotal+= review_t2.rating;
-      $scope.ratingCount++;
+      angular.forEach($scope.userReviewsList, function(review) {
+        $scope.ratingTotal += parseFloat(review.rating, 10);
+        $scope.ratingCount++;
+      });
 
       $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
     };
-    $scope.init();
+    $scope.userReviewsList.$loaded()
+      .then(function(){
+        if($scope.userReviewsList.length) $scope.init();
+      });
 
     $scope.onMessage = function() {
       $ionicViewSwitcher.nextDirection('forward');
@@ -321,30 +331,61 @@ angular.module('bookie.controllers', ["firebase"])
         'user': $scope.name
       });
     }
-  })
 
-  .controller('ReviewCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams) {
-    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
-    // works for getting the size of a dictionary.
-    $scope.name = $stateParams.user;
-    $scope.userReviews = {};
-    $scope.ratingTotal = 0;
-    $scope.ratingCount = 0;
+    $scope.rating = "0";
 
-    $scope.init = function() {
-      // TODO: Get user's review list, rating total, and rating count from Firebase
+    $scope.doReview = function() {
+      var textarea = document.getElementById("reviewMessage");
+      var reviewMessage = textarea.value;
+      var currentdate = new Date();
+      if(reviewMessage !== "" && $scope.rating !== "0") {
+        console.log('Doing review');
+        var reviewFolder = '/user/' + $stateParams.uid + '/reviews/'
+          + (Math.round(currentdate.getTime() / 1000)).toString();
+        firebase.database().ref(reviewFolder).set(
+          {
+            uid: $scope.user.uid,
+            displayName: $scope.user.displayName,
+            email: $scope.user.email,
+            photoURL: $scope.user.photoURL,
+            time: currentdate.toLocaleString(),
+            message: reviewMessage,
+            rating: $scope.rating
+          });
+        console.log("Review successfully stored");
+        textarea.value = "";
+        alert("Success!");
+        $scope.rating = "0";
+        $state.go($state.current, {}, {reload: true});
+      }
+      else {
+        alert("Text box must contain input in order to submit.");
+      }
     };
-    $scope.init();
 
-    $scope.onSubmitReview = function() {
-      var review = new Review($scope.ratingCount+1, firebase.auth().currentUser.displayName, $scope.rating, $scope.reviewContent);
+    $('textarea').each(function () {
+      this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+    }).on('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
 
-      // TODO: Add review to the user's review list, update rating total, update rating count
-      $ionicViewSwitcher.nextDirection('back');
-      $state.go('app.userProfile', {
-        'user': $scope.name
-      });
-    };
+    $scope.goToUser = function(review) {
+      if(review.uid === $scope.user.uid) {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.myProfile');
+      }
+      else {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.userProfile', {
+          'uid': review.uid,
+          'displayName': review.displayName,
+          'email': review.email,
+          'photoURL': review.photoURL
+        });
+      }
+    }
+
   })
 
   .controller('AppCtrl', function($rootScope, $scope, $ionicModal, $ionicViewSwitcher, $timeout, $state) {
@@ -397,7 +438,7 @@ angular.module('bookie.controllers', ["firebase"])
     };
   })
 
-  .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray) {
+  .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray, $ionicViewSwitcher) {
     $scope.user = firebase.auth().currentUser;
 
     var postsRef = firebase.database().ref('/posts/');
@@ -408,12 +449,6 @@ angular.module('bookie.controllers', ["firebase"])
       var textarea = document.getElementById("postMessage");
       var postMessage = textarea.value;
       var currentdate = new Date();
-      var datetime = "Last Sync: " + currentdate.getDate() + "/"
-        + (currentdate.getMonth()+1)  + "/"
-        + currentdate.getFullYear() + " @ "
-        + currentdate.getHours() + ":"
-        + currentdate.getMinutes() + ":"
-        + currentdate.getSeconds();
       if(postMessage !== "") {
         console.log('Doing post');
         var postFolder = '/posts/'
@@ -449,6 +484,23 @@ angular.module('bookie.controllers', ["firebase"])
       this.style.height = 'auto';
       this.style.height = (this.scrollHeight) + 'px';
     });
+
+    $scope.goToUser = function(post) {
+      if(post.uid === $scope.user.uid) {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.myProfile');
+      }
+      else {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.userProfile', {
+          'uid': post.uid,
+          'displayName': post.displayName,
+          'email': post.email,
+          'photoURL': post.photoURL
+        });
+      }
+    }
+
   })
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
