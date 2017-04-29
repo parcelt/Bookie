@@ -507,9 +507,9 @@ angular.module('bookie.controllers', ["firebase"])
         destinationType: navigator.camera.DestinationType.DATA_URL,
         sourceType: navigator.camera.PictureSourceType.CAMERA,
         allowEdit: true,
-        encodingType: navigator.camera.EncodingType.JPEG,
-        targetWidth: 100,
-        targetHeight: 100,
+        encodingType: navigator.camera.EncodingType.PNG,
+        targetWidth: 640,
+        targetHeight: 640,
         popoverOptions: navigator.camera.PopoverArrowDirection.ARROW_UP,
         saveToPhotoAlbum: false,
         correctOrientation:true
