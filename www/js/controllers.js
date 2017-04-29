@@ -24,6 +24,9 @@ angular.module('bookie.controllers', ["firebase"])
     // Form data for the login modal
     $scope.loginData = {};
 
+    $scope.loginData.email = "zkocken@wisc.edu";
+    $scope.loginData.password = "bookie";
+
     $scope.doLogin = function() {
       //TODO: Verify via Firebase
       firebase.auth().signInWithEmailAndPassword($scope.loginData.email, $scope.loginData.password)
@@ -430,6 +433,10 @@ angular.module('bookie.controllers', ["firebase"])
       else {
         alert("Text box must contain input in order to post.");
       }
+    };
+
+    $scope.parseJSON = function(raw) {
+      return JSON.parse(raw);
     };
 
     // $scope.doPost = function() {
