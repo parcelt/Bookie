@@ -104,7 +104,7 @@ angular.module('bookie.controllers', ["firebase"])
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
-          if (errorCode == 'auth/weak-password') {
+          if (errorCode === 'auth/weak-password') {
             alert('The password is too weak.');
           } else {
             alert(errorMessage);
