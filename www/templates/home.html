@@ -1,7 +1,7 @@
 <ion-view view-title="Home">
   <ion-content>
     <ion-list>
-      <ion-item class="item-avatar" ng-controller="HomeCtrl">
+      <ion-item class="item-avatar" id="postHeader" ng-controller="HomeCtrl">
         <img src={{user.photoURL}} style="width:40px;height:40px">
         <h2>
           <textarea id="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
@@ -40,7 +40,7 @@
           <p>{{post.time}}</p>
         </ion-item>
         <ion-item class="item-body">
-          <p>
+          <p style="color:black;">
             {{post.message}}
           </p>
           <div ng-repeat="image in parseJSON(post.images)">

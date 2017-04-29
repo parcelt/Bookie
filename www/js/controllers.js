@@ -382,6 +382,7 @@ angular.module('bookie.controllers', ["firebase"])
       firebase.auth().signOut()
         .then(function() {
           //$ionicViewSwitcher.nextDirection('forward');
+          $rootScope.images = []; //Reset images array to be empty
           $state.go('login');
           $timeout(function() {
             $scope.closeLogout();
@@ -442,57 +443,12 @@ angular.module('bookie.controllers', ["firebase"])
       return JSON.parse(raw);
     };
 
-    // $scope.doPost = function() {
-    //   $scope.user = firebase.auth().currentUser;
-    //   var textarea = document.getElementById("postMessage");
-    //   var postMessage = textarea.value;
-    //   if(postMessage !== "") {
-    //     console.log('Doing post');
-    //     var postFolder = '/user/' + $scope.user.uid + '/public/posts/' //TODO ------------------------------------------------
-    //       + (Math.round(new Date().getTime()) / 1000).toString();
-    //     var i = 0;
-    //     if($rootScope.images.length > 0) {
-    //       for(i = 0; i < $rootScope.images.length; i++) {
-    //         firebase.database().ref(postFolder).child('photo'+i+'.png')
-    //           .putString($rootScope.images[i], 'base64', {contentType: 'image/png'})
-    //           .then(function () {
-    //             console.log("Photo(s) successfully stored");
-    //
-    //           })
-    //           .catch(function (error) {
-    //             alert("Oops! There was an problem with your image format, so we could not store it.");
-    //             console.log(error);
-    //           });
-    //       }
-    //     }
-    //     if(i === $rootScope.images.length) {
-    //       $rootScope.images = []; //Reset images array to be empty
-    //       firebase.storage().ref(postFolder).child('message.txt').putString(textarea.value)
-    //         .then(function () {
-    //           console.log("Message successfully stored");
-    //           textarea.value = "";
-    //           alert("Success!");
-    //           $state.go($state.current, {}, {reload: true});
-    //         })
-    //         .catch(function (error) {
-    //           alert(error.message);
-    //           console.log(error);
-    //         });
-    //     }
-    //   }
-    //   else {
-    //     alert("Text box must contain input in order to post.");
-    //   }
-    // };
-
     $('textarea').each(function () {
       this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
     }).on('input', function () {
       this.style.height = 'auto';
       this.style.height = (this.scrollHeight) + 'px';
     });
-
-
   })
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {

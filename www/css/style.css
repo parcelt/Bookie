@@ -15,3 +15,29 @@ button.post {
   margin-right:0px;
   clear:left;
 }
+#postHeader{
+  background-color: lightgray;
+  border: solid black;
+  border-radius: 5px;
+}
+ion-item.item-avatar {
+  background-color: lightgray;
+  border-top-style: solid;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-left-style: solid;
+  border-right-style: solid;
+  border-bottom-style: none;
+  border-color: black;
+}
+ion-item.item-body {
+  background-color: lightgray;
+  background-color: lightgray;
+  border-bottom-style: solid;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left-style: solid;
+  border-right-style: solid;
+  border-top-style: none;
+  border-color: black;
+}
