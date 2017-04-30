@@ -1,7 +1,8 @@
 <ion-view view-title="Posts">
   <ion-content>
+    <ion-list>
 
-    <div class="bottom">
+    <!-- <div class="bottom">
       <div style="float: left; width: 100%;">
         <label class="item item-input">
           <i class="icon ion-search placeholder-icon"></i>
@@ -9,11 +10,30 @@
                  ng-model="$parent.search" placeholder="Search">
         </label>
       </div>
-    </div>
+    </div> -->
 
-    <ul>
+    <!-- <ul>
       <li class="button button-full" ng-repeat="selectedPost in myPosts" ng-click="onSelectPost(selectedPost)">
         Name: {{selectedPost.name}} <br>Posted at: {{selectedPost.time}} <br>Content: {{selectedPost.content}}</li>
-    </ul>
+    </ul> -->
+
+    <div ng-repeat="post in postsList | orderBy:'-'" ng-click="onSelectPost(post)">
+      <br>
+      <ion-item class="item-avatar">
+        <img src={{post.photoURL}} />
+        <h2>{{post.displayName}}</h2>
+        <p>{{post.time}}</p>
+      </ion-item>
+      <ion-item class="item-body">
+        <p style="color:black;">
+          {{post.message}}
+        </p>
+        <div ng-repeat="image in parseJSON(post.images)">
+          <img class="full-image" ng-src="data:image/png;base64,{{image}}" width="100%" />
+        </div>
+      </ion-item>
+      <br>
+    </div>
+      <ion-list>
   </ion-content>
 </ion-view>

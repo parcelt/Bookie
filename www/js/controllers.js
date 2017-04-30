@@ -186,51 +186,113 @@ angular.module('bookie.controllers', ["firebase"])
     }
   })
 
-  .controller('PostsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item) {
-    $rootScope.myPosts = {};
+  .controller('PostsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
+    var postsRef = firebase.database().ref('/posts/');
+    var query = postsRef.orderByChild("uid").equalTo($rootScope.user.uid);
+    $scope.postsList = $firebaseArray(query);
+    $scope.postsList.$loaded()
+      .then(function() {
+      console.log("length = " + $scope.postsList.length);
+    })
+    .catch(function(error) {
+      console.log("Error: ", error);
+    })
+    console.log($rootScope.user.uid);
 
-    $scope.index_t1 = 0;
-    $scope.name_t1 = firebase.auth().currentUser.displayName;
-    $scope.time_t1 = "9:45am";
-    $scope.content_t1 = "Also I'm selling this thing.";
-    $scope.index_t2 = 1;
-    $scope.name_t2 = firebase.auth().currentUser.displayName;
-    $scope.time_t2 = "9:29am";
-    $scope.content_t2 = "I just super NEED this book out of my sight, please.";
-
-    $scope.init = function() {
-      var post_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
-      var post_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
-      $rootScope.myPosts[0] = post_t1;
-      $rootScope.myPosts[1] = post_t2;
-    }
-    $scope.init();
-
+    $scope.parseJSON = function(raw) {
+      return JSON.parse(raw);
+    };
 
     $scope.onSearch = function() {
 
     }
 
-    $scope.onSelectPost = function(selectedPost) {
+    $scope.onSelectPost = function(post) {
       $ionicViewSwitcher.nextDirection('forward');
       $state.go('app.editPost', {
-        'index': selectedPost.index
+        'key': $scope.postsList.$keyAt(post),
+        'loaded': false
       });
+      console.log("post clicked");
     }
   })
 
-  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams) {
-    $scope.post = $rootScope.myPosts[$stateParams.index];
-    $scope.content = $scope.post.content;
+  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams, $firebaseArray) {
+    $scope.parseJSON = function(raw) {
+      return JSON.parse(raw);
+    };
+
+    $scope.post;
+    $scope.images = [];
+    var location = '/posts/' + $stateParams.key;
+    firebase.database().ref(location).once("value", function(snap) {
+      if(snap.val() != null) $scope.post = snap.val();
+      $scope.images = $scope.parseJSON($scope.post.images);
+      document.getElementById("editMessage").style.height = 'auto';
+      document.getElementById("editMessage").style.height = (this.scrollHeight) + 'px';
+      $state.go($state.current, {}, {reload: true});
+      console.log("num images: " + $scope.images.length);
+    });
+
+    $scope.$watch(function() {
+      return $rootScope.images;
+    }, function() {
+      $scope.images = $scope.images.concat($rootScope.images);
+      $rootScope.images = [];
+    });
 
     $scope.onSaveChanges = function() {
-      // TODO: Update index to place at top
-      $scope.post.time = 'TIME UPDATED' // TODO: Update time properly
-      $rootScope.myPosts[$stateParams.index] = new Item($scope.post.index, $scope.post.name, $scope.post.time, $scope.content);
-
+      var textarea = document.getElementById("editMessage");
+      var postMessage = textarea.value;
+      var currentdate = new Date();
+      var datetime = "Last Sync: " + currentdate.getDate() + "/"
+        + (currentdate.getMonth()+1)  + "/"
+        + currentdate.getFullYear() + " @ "
+        + currentdate.getHours() + ":"
+        + currentdate.getMinutes() + ":"
+        + currentdate.getSeconds();
+      if(postMessage !== "") {
+        console.log('Doing post');
+        firebase.database().ref(location).set(
+          {
+            uid: $rootScope.user.uid,
+            displayName: $rootScope.user.displayName,
+            email: $rootScope.user.email,
+            photoURL: $rootScope.user.photoURL,
+            time: currentdate.toLocaleString() + " (edited)",
+            message: postMessage,
+            images: JSON.stringify($scope.images)
+          });
+        console.log("Post successfully stored");
+        $scope.images = []; //Reset images array to be empty
+        textarea.value = "";
+        alert("Success!");
+        $state.go($state.current, {}, {reload: true});
+      }
+      else {
+        alert("Text box must contain input in order to post.");
+      }
       $ionicViewSwitcher.nextDirection('back');
       $state.go('app.posts');
     }
+
+    $scope.onDeletePhotos = function() {
+      $scope.images = [];
+      $scope.onSaveChanges();
+    }
+
+    $scope.onDeletePost = function() {
+      firebase.database().ref(location).remove();
+      $ionicViewSwitcher.nextDirection('back');
+      $state.go('app.posts');
+    }
+
+    $('textarea').each(function () {
+      this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+    }).on('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
   })
 
   .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review) {
@@ -398,13 +460,13 @@ angular.module('bookie.controllers', ["firebase"])
   })
 
   .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray) {
-    $scope.user = firebase.auth().currentUser;
+    $rootScope.user = firebase.auth().currentUser;
 
     var postsRef = firebase.database().ref('/posts/');
     $scope.postsList = $firebaseArray(postsRef);
 
     $scope.doPost = function() {
-      $scope.user = firebase.auth().currentUser;
+      $rootScope.user = firebase.auth().currentUser;
       var textarea = document.getElementById("postMessage");
       var postMessage = textarea.value;
       var currentdate = new Date();
@@ -420,10 +482,10 @@ angular.module('bookie.controllers', ["firebase"])
           + (Math.round(currentdate.getTime() / 1000)).toString();
         firebase.database().ref(postFolder).set(
           {
-            uid: $scope.user.uid,
-            displayName: $scope.user.displayName,
-            email: $scope.user.email,
-            photoURL: $scope.user.photoURL,
+            uid: $rootScope.user.uid,
+            displayName: $rootScope.user.displayName,
+            email: $rootScope.user.email,
+            photoURL: $rootScope.user.photoURL,
             time: currentdate.toLocaleString(),
             message: postMessage,
             images: JSON.stringify($rootScope.images)
