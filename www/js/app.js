@@ -95,13 +95,16 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.userProfile', {
-        url: '/userProfile/:user',
+        url: '/userProfile/:uid',
+        params: {
+          'uid': 'uid_placeholder',
+          'displayName': 'displayName_placeholder',
+          'email': 'email_placeholder',
+          'photoURL': 'photoURL_placeholder'
+        },
         views: {
           'menuContent': {
             templateUrl: 'templates/userProfile.html',
-            params: {
-              'user': 'user_placeholder'
-            },
             controller: 'UserProfileCtrl'
           }
         }

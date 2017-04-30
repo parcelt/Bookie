@@ -1,4 +1,4 @@
-<ion-view view-title="{{user.displayName}}'s Profile">
+<ion-view view-title="{{user.displayName}}'s Profile" ng-controller="UserProfileCtrl">
   <ion-content>
 
     <div align="center">
@@ -15,7 +15,7 @@
     </div>
     <div class="bottom">
       <div style="float: left; width: 100%;">
-        <p1>Rating: {{ratingAve}}/5</p1>
+        <p1>Average Rating: {{ratingAve | number:1}}/5</p1>
       </div>
     </div>
     <div class="bottom">
@@ -25,9 +25,20 @@
         </button>
       </div>
     </div>
-    <ul>
-      <li class="button button-full" ng-repeat="selectedReview in myReviews">
-        Name: {{selectedReview.name}} <br>Rating: {{selectedReview.rating}} <br>Content: {{selectedReview.content}}</li>
-    </ul>
+    <div ng-repeat="review in myReviewsList | orderBy:'-'">
+      <br>
+      <ion-item class="item-avatar" ng-controller="MyProfileCtrl" ng-click="goToUser(review)">
+        <img src={{review.photoURL}} />
+        <h2>{{review.displayName}}</h2>
+        <h2>Rating: {{review.rating}}/5</h2>
+        <p>{{review.time}}</p>
+      </ion-item>
+      <ion-item class="item-body">
+        <p style="color:black;">
+          {{review.message}}
+        </p>
+      </ion-item>
+      <br>
+    </div>
   </ion-content>
 </ion-view>
