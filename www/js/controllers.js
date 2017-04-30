@@ -225,22 +225,13 @@ angular.module('bookie.controllers', ["firebase"])
     };
 
     $scope.post;
-    $scope.images = [];
     var location = '/posts/' + $stateParams.key;
     firebase.database().ref(location).once("value", function(snap) {
       if(snap.val() != null) $scope.post = snap.val();
-      $scope.images = $scope.parseJSON($scope.post.images);
+      $rootScope.images = $scope.parseJSON($scope.post.images);
       document.getElementById("editMessage").style.height = 'auto';
       document.getElementById("editMessage").style.height = (this.scrollHeight) + 'px';
       $state.go($state.current, {}, {reload: true});
-      console.log("num images: " + $scope.images.length);
-    });
-
-    $scope.$watch(function() {
-      return $rootScope.images;
-    }, function() {
-      $scope.images = $scope.images.concat($rootScope.images);
-      $rootScope.images = [];
     });
 
     $scope.onSaveChanges = function() {
@@ -263,10 +254,10 @@ angular.module('bookie.controllers', ["firebase"])
             photoURL: $rootScope.user.photoURL,
             time: currentdate.toLocaleString() + " (edited)",
             message: postMessage,
-            images: JSON.stringify($scope.images)
+            images: JSON.stringify($rootScope.images)
           });
         console.log("Post successfully stored");
-        $scope.images = []; //Reset images array to be empty
+        $rootScope.images = []; //Reset images array to be empty
         textarea.value = "";
         alert("Success!");
         $state.go($state.current, {}, {reload: true});
@@ -279,8 +270,7 @@ angular.module('bookie.controllers', ["firebase"])
     }
 
     $scope.onDeletePhotos = function() {
-      $scope.images = [];
-      $scope.onSaveChanges();
+      $rootScope.images = [];
     }
 
     $scope.onDeletePost = function() {
@@ -299,9 +289,6 @@ angular.module('bookie.controllers', ["firebase"])
 
   .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $firebaseArray) {
 
-    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
-    // works for getting the size of a dictionary. ANSWER: .length
-
     var reviewsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/reviews/');
     $scope.myReviewsList = $firebaseArray(reviewsRef);
 
@@ -311,12 +298,12 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
 
-    $scope.$watch(function() {
+    /*$scope.$watch(function() {
       return $rootScope.images;
     }, function() {
       $scope.photo = $rootScope.images[0];
       $rootScope.images = [];
-    });
+    });*/
 
     $scope.init = function() {
       angular.forEach($scope.myReviewsList, function(review) {
@@ -642,7 +629,7 @@ angular.module('bookie.controllers', ["firebase"])
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
     //The scope array is used for our ng-repeat to store the links to the images
-    $rootScope.images = [];
+    //$rootScope.images = [];
 
     $scope.addImage = function() {
       // The options array is passed to the cordovaCamera with specific options.
