@@ -148,7 +148,7 @@ angular.module('bookie.controllers', ["firebase"])
 
   .controller('ChatUserCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams) {
     $scope.chatStream = {};
-    $scope.user = $stateParams.user;
+    $scope.displayName = $stateParams.user;
 
     // Fill chatStream via Firebase TODO: Firebase
     $scope.index_t1 = 0;
@@ -249,7 +249,7 @@ angular.module('bookie.controllers', ["firebase"])
 
     $scope.init = function() {
       angular.forEach($scope.myReviewsList, function(review) {
-        $scope.ratingTotal += parseFloat(review.rating, 10);
+        $scope.ratingTotal += parseFloat(review.rating);
         $scope.ratingCount++;
       });
 
@@ -262,20 +262,7 @@ angular.module('bookie.controllers', ["firebase"])
 
     $scope.onSaveChanges = function() {
       // TODO: Update user info via Firebase
-    }
-
-//    $scope.user = firebase.auth().currentUser;
-//
-//    var ref = firebase.database().ref('/user/' + user.uid)
-//    ref.once("value")
-//      .then(function(snapshot) {
-//        var hasName = snapshot.hasChild("reviews"); // true
-//    });
-//
-//    if (hasName){
-//       var reviewsRef = firebase.database().ref('/user/reviews');
-//       $scope.myReviewsList = $firebaseArray(reviewsRef);
-//    }
+    };
 
     $scope.goToUser = function(review) {
       $ionicViewSwitcher.nextDirection('forward');
@@ -307,7 +294,7 @@ angular.module('bookie.controllers', ["firebase"])
 
     $scope.init = function() {
       angular.forEach($scope.userReviewsList, function(review) {
-        $scope.ratingTotal += parseFloat(review.rating, 10);
+        $scope.ratingTotal += parseFloat(review.rating);
         $scope.ratingCount++;
       });
 
@@ -321,16 +308,12 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.onMessage = function() {
       $ionicViewSwitcher.nextDirection('forward');
       $state.go('app.chatUser', {
-        'user': $scope.name
+        'uid': $scope.uid,
+        'displayName': $scope.displayName,
+        'email': $scope.email,
+        'photoURL': $scope.photoURL
       });
     };
-
-    $scope.onLeaveReview = function() {
-      $ionicViewSwitcher.nextDirection('forward');
-      $state.go('app.review', {
-        'user': $scope.name
-      });
-    }
 
     $scope.rating = "0";
 
