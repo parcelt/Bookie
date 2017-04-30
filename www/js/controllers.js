@@ -23,6 +23,8 @@ angular.module('bookie.controllers', ["firebase"])
   .controller('LoginCtrl', function($rootScope, $scope, $ionicViewSwitcher, $ionicModal, $state, $timeout) {
     // Form data for the login modal
     $scope.loginData = {};
+    $scope.loginData.email="zkocken@wisc.edu";
+    $scope.loginData.password="bookie";
 
     $scope.doLogin = function() {
       firebase.auth().signInWithEmailAndPassword($scope.loginData.email, $scope.loginData.password)
@@ -79,19 +81,19 @@ angular.module('bookie.controllers', ["firebase"])
           $scope.loginData.password = $scope.createAccountData.password;
           $scope.doLogin();
           var user = firebase.auth().currentUser;
-          user.updateProfile({
-            displayName: $scope.createAccountData.username,
-            photoURL: "http://i.ebayimg.com/images/g/aJUAAOSwT6pVw1wO/s-l300.jpg"
-          }).then(function() {
-            console.log("Update successful");
-            firebase.database().ref('/user/' + user.uid).set(
-              {
-                uid: user.uid,
-                displayName: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL
-              }
-            );
+            user.updateProfile({
+              displayName: $scope.createAccountData.username,
+              photoURL: "http://i.ebayimg.com/images/g/aJUAAOSwT6pVw1wO/s-l300.jpg"
+            }).then(function() {
+              console.log("Update successful");
+              firebase.database().ref('/user/' + user.uid).set(
+                {
+                  uid: user.uid,
+                  displayName: user.displayName,
+                  email: user.email,
+                  photoURL: user.photoURL
+                }
+              );
 
           }).catch(function(error) {
             alert(error.message);
@@ -190,14 +192,14 @@ angular.module('bookie.controllers', ["firebase"])
     var postsRef = firebase.database().ref('/posts/');
     var query = postsRef.orderByChild("uid").equalTo($rootScope.user.uid);
     $scope.postsList = $firebaseArray(query);
-    $scope.postsList.$loaded()
+    /*$scope.postsList.$loaded()
       .then(function() {
       console.log("length = " + $scope.postsList.length);
     })
     .catch(function(error) {
       console.log("Error: ", error);
     })
-    console.log($rootScope.user.uid);
+    console.log($rootScope.user.uid);*/
 
     $scope.parseJSON = function(raw) {
       return JSON.parse(raw);
@@ -299,15 +301,22 @@ angular.module('bookie.controllers', ["firebase"])
 
     // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
     // works for getting the size of a dictionary. ANSWER: .length
-    $scope.user = firebase.auth().currentUser;
 
-    var reviewsRef = firebase.database().ref('/user/' + $scope.user.uid + '/reviews/');
+    var reviewsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/reviews/');
     $scope.myReviewsList = $firebaseArray(reviewsRef);
 
-    $scope.name = $scope.user.displayName;
+    $scope.name = $rootScope.user.displayName;
+    $scope.photo = $rootScope.user.photoURL;
     $scope.ratingTotal = 0.0;
     $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
+
+    $scope.$watch(function() {
+      return $rootScope.images;
+    }, function() {
+      $scope.photo = $rootScope.images[0];
+      $rootScope.images = [];
+    });
 
     $scope.init = function() {
       angular.forEach($scope.myReviewsList, function(review) {
@@ -322,8 +331,76 @@ angular.module('bookie.controllers', ["firebase"])
         if($scope.myReviewsList.length) $scope.init();
       });
 
+    $scope.updatePosts = function(name, photoURL) {
+      var currRef = firebase.database().ref('/posts/');
+      var query = currRef.orderByChild("uid").equalTo($rootScope.user.uid);
+      var list = $firebaseArray(query);
+      list.$loaded()
+        .then(function() {
+          for(var i = 0; i < list.length; i++) {
+            list[i].displayName = name;
+            list[i].photoURL = photoURL;
+            list.$save(i);
+          }
+        })
+        .catch(function(error) {
+          console.log("Error: ", error);
+        });
+    }
+
+    $scope.findUsers = function(name, photoURL) {
+      var currRef = firebase.database().ref('/user/');
+      var list = $firebaseArray(currRef);
+      list.$loaded()
+        .then(function() {
+          for(var i = 0; i < list.length; i++) {
+            $scope.updateReviews(list[i].$id, name, photoURL);
+          }
+        })
+        .catch(function(error) {
+          console.log("Error: ", error);
+        });
+    }
+
+    $scope.updateReviews = function(id, name, photoURL) {
+      var currRef = firebase.database().ref('/user/' + id + '/reviews/');
+      var query = currRef.orderByChild("uid").equalTo($rootScope.user.uid);
+      var list = $firebaseArray(query);
+      list.$loaded()
+        .then(function() {
+          for(var i = 0; i < list.length; i++) {
+            list[i].displayName = name;
+            list[i].photoURL = photoURL;
+            list.$save(i);
+          }
+        })
+        .catch(function(error) {
+          console.log("Error: ", error);
+        });
+    }
+
     $scope.onSaveChanges = function() {
-      // TODO: Update user info via Firebase
+      var name = document.getElementById("myName-textarea").value;
+      var photoURL = $scope.photo;
+      $rootScope.user.updateProfile({
+        displayName: name,
+        photoURL: photoURL
+      }).then(function() {
+        // Update user data
+        firebase.database().ref('/user/' + $rootScope.user.uid).update({"displayName": name});
+        firebase.database().ref('/user/' + $rootScope.user.uid).update({"photoURL": photoURL});
+
+        // Update posts
+        $scope.updatePosts(name, photoURL);
+
+        // Update reviews TODO: and chats
+        $scope.findUsers(name, photoURL);
+
+        console.log("Update queued");
+      }).catch(function(error) {
+        alert(error.message);
+        console.log(error);
+      })
     }
 
 //    $scope.user = firebase.auth().currentUser;
@@ -499,7 +576,7 @@ angular.module('bookie.controllers', ["firebase"])
         });
     };
   })
-  
+
   .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray, $ionicViewSwitcher) {
     $rootScope.user = firebase.auth().currentUser;
 
