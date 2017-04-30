@@ -75,13 +75,13 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.editPost', {
-        url: '/editPost/:index',
+        url: '/editPost/:key',
+        params: {
+          'key': "key_placeholder"
+        },
         views: {
           'menuContent': {
             templateUrl: 'templates/editPost.html',
-            params: {
-              'index': 0
-            },
             controller: 'EditPostCtrl'
           }
         }

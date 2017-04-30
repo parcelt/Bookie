@@ -1,17 +1,57 @@
 <ion-view view-title="Edit Post">
   <ion-content>
-    <div class="bottom">
-      <div style="float: left; width: 100%;">
-        <label class="item item-input">
-          <input type="text" name="content" id="content-textarea"
-                 ng-model="$parent.content" placeholder="Message Content">
-        </label>
-      </div>
-    </div>
+    <ion-item class="item-avatar" id="postHeader" ng-controller="EditPostCtrl">
+      <img src={{user.photoURL}} style="width:40px;height:40px">
+      <h2>{{post.displayName}}</h2>
+      <p>{{post.time}}</p>
+      <h2>
+        <textarea id="editMessage" style="width:100%" ng-model="$parent.post.message" placeholder="Post not loaded!"></textarea>
+      </h2>
+    </ion-item>
+    <ion-item class="padding" ng-controller="ImageCtrl">
+      <ion-item class="item-icon-left">
+        <i class="icon ion-plus-circled" ng-click="addImage()"></i>
+        Add a photo
+      </ion-item>
+      <br><br>
+      <ion-scroll>
+        <div class="row" ng-repeat="image in images" ng-if="$index % 4 === 0">
+          <div class="col col-25" ng-if="$index < images.length">
+            <img ng-src="data:image/png;base64,{{images[$index]}}" width="100%" />
+          </div>
+          <div class="col col-25" ng-if="$index + 1 < images.length">
+            <img ng-src="data:image/png;base64,{{images[$index + 1]}}" width="100%" />
+          </div>
+          <div class="col col-25" ng-if="$index + 2 < images.length">
+            <img ng-src="data:image/png;base64,{{images[$index + 2]}}" width="100%" />
+          </div>
+          <div class="col col-25" ng-if="$index + 3 < images.length">
+            <img ng-src="data:image/png;base64,{{images[$index + 3]}}" width="100%" />
+          </div>
+        </div>
+      </ion-scroll>
+    </ion-item>
+
     <div class="bottom">
       <div align="center">
-        <button style="float: none; width: 30%;" class="button button-royal button-large" ng-click="onSaveChanges()">
+        <button style="float: none; width: 30%;" class="button button-royal button-small" ng-click="onSaveChanges()">
           Save Changes
+        </button>
+      </div>
+    </div>
+    <br>
+    <div class="bottom">
+      <div align="center">
+        <button style="float: none; width: 30%;" class="button button-royal button-small" ng-click="onDeletePhotos()">
+          Delete Photos
+        </button>
+      </div>
+    </div>
+    <br>
+    <div class="bottom">
+      <div align="center">
+        <button style="float: none; width: 30%;" class="button button-royal button-small" ng-click="onDeletePost()">
+          Delete Post
         </button>
       </div>
     </div>
