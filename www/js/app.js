@@ -50,12 +50,15 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
 
       .state('app.chatUser', {
         url: '/chatUser/:user',
+        params: {
+          'uid': 'uid_placeholder',
+          'displayName': 'displayName_placeholder',
+          'email': 'email_placeholder',
+          'photoURL': 'photoURL_placeholder'
+        },
         views: {
           'menuContent': {
             templateUrl: 'templates/chatUser.html',
-            params: {
-              'user': 'user_placeholder'
-            },
             controller: 'ChatUserCtrl'
           }
         }
