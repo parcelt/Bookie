@@ -309,17 +309,14 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
 
-    $scope.init = function() {
-      angular.forEach($scope.myReviewsList, function(review) {
-        $scope.ratingTotal += parseFloat(review.rating);
-        $scope.ratingCount++;
-      });
-
-      $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
-    };
     $scope.myReviewsList.$loaded()
       .then(function(){
-        if($scope.myReviewsList.length) $scope.init();
+        angular.forEach($scope.myReviewsList, function(review) {
+          $scope.ratingTotal += parseFloat(review.rating);
+          $scope.ratingCount++;
+        });
+
+        $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
       });
 
     $scope.onSaveChanges = function() {
@@ -354,17 +351,14 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
 
-    $scope.init = function() {
-      angular.forEach($scope.userReviewsList, function(review) {
-        $scope.ratingTotal += parseFloat(review.rating);
-        $scope.ratingCount++;
-      });
-
-      $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
-    };
     $scope.userReviewsList.$loaded()
       .then(function(){
-        if($scope.userReviewsList.length) $scope.init();
+        angular.forEach($scope.userReviewsList, function(review) {
+          $scope.ratingTotal += parseFloat(review.rating);
+          $scope.ratingCount++;
+        });
+
+        $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
       });
 
     $scope.onMessage = function() {
@@ -482,7 +476,7 @@ angular.module('bookie.controllers', ["firebase"])
         });
     };
   })
-  
+
   .controller('HomeCtrl', function($rootScope, $scope, $state, $firebaseArray, $ionicViewSwitcher) {
     $rootScope.user = firebase.auth().currentUser;
 
