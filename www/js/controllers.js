@@ -117,23 +117,19 @@ angular.module('bookie.controllers', ["firebase"])
   })
 
   .controller('SettingsCtrl', function($rootScope, $scope) {
-    /*$scope.email;
-    $scope.password;
-    $scope.newPassword;
-    $scope.newPasswordConfirm;
-    $scope.doUpdatePassword = function() {
-      firebase.auth().currentUser.reauthenticate($scope.email, $scope.password).then(function(){
-        firebase.auth().currentUser.updatePassword($scope.newPassword).then(function() {
-          console.log("password updated");
+    $scope.doUpdatePassword = function(){
+      var newPassword = document.getElementById("newPassword").value;
+      var newPasswordConfirm = document.getElementById("newPasswordConfirm").value;
+      if(newPassword === newPasswordConfirm){
+        $rootScope.user.updatePassword(newPassword).then(function() {
+          alert("Password Updated");
+        } , function(error) {
+          alert("Password Update Failed");
         })
-          .catch(function(error) {
-            console.log("password not updated");
-          })
-      })
-        .catch(function(error) {
-          console.log("invalid credentials");
-        })
-    }*/
+      } else {
+        alert("Passwords Do Not Match");
+      }
+    };
   })
 
   .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item) {
@@ -306,6 +302,10 @@ angular.module('bookie.controllers', ["firebase"])
       this.style.height = 'auto';
       this.style.height = (this.scrollHeight) + 'px';
     });
+
+    $scope.$on('$ionicView.beforeLeave', function() {
+      $rootScope.images = [];
+    });
   })
 
   .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $firebaseArray) {
@@ -369,6 +369,7 @@ angular.module('bookie.controllers', ["firebase"])
         .then(function() {
           for(var i = 0; i < list.length; i++) {
             $scope.updateReviews(list[i].$id, name, photoURL);
+            // TODO: $scope.updateChats(list[i].$id, name, photoURL);
           }
         })
         .catch(function(error) {
@@ -396,7 +397,6 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.onSaveChanges = function() {
       var name = document.getElementById("myName-textarea").value;
       var photoURL = $rootScope.images[$rootScope.images.length - 1];
-      console.log("images length: " + $rootScope.images.length);
       $rootScope.user.updateProfile({
         displayName: name,
         photoURL: photoURL
@@ -408,7 +408,7 @@ angular.module('bookie.controllers', ["firebase"])
         // Update posts
         $scope.updatePosts(name, photoURL);
 
-        // Update reviews TODO: and chats
+        // Update reviews TODO: and chats (called at the end of findUsers)
         $scope.findUsers(name, photoURL);
 
         console.log("Update queued");
@@ -443,11 +443,12 @@ angular.module('bookie.controllers', ["firebase"])
       });
     }
 
+    $scope.$on('$ionicView.beforeLeave', function() {
+      $rootScope.images = [];
+    });
   })
 
   .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams, $firebaseArray) {
-    // It seems we'll have to track total rating and count of ratings to compute the average, since nothing I've tried
-    // works for getting the size of a dictionary.
     $scope.user = firebase.auth().currentUser;
 
     var reviewsRef = firebase.database().ref('/user/' + $stateParams.uid + '/reviews/');
@@ -649,8 +650,11 @@ angular.module('bookie.controllers', ["firebase"])
           'photoURL': post.photoURL
         });
       }
-    }
+    };
 
+    $scope.$on('$ionicView.beforeLeave', function() {
+      $rootScope.images = [];
+    });
   })
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
