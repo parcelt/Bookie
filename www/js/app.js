@@ -130,7 +130,8 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
         url: '/settings',
         views: {
           'menuContent': {
-            templateUrl: 'templates/settings.html'
+            templateUrl: 'templates/settings.html',
+            controller: 'SettingsCtrl'
           }
         }
       })

@@ -41,3 +41,6 @@ ion-item.item-body {
   border-top-style: none;
   border-color: black;
 }
+.img-circle {
+  border-radius: 50%;
+}

@@ -20,7 +20,7 @@
     <div ng-repeat="post in postsList | orderBy:'-'" ng-click="onSelectPost(post)">
       <br>
       <ion-item class="item-avatar">
-        <img src={{post.photoURL}} />
+        <img src="data:image/jpeg;base64,{{post.photoURL}}" />
         <h2>{{post.displayName}}</h2>
         <p>{{post.time}}</p>
       </ion-item>
@@ -29,7 +29,7 @@
           {{post.message}}
         </p>
         <div ng-repeat="image in parseJSON(post.images)">
-          <img class="full-image" ng-src="data:image/png;base64,{{image}}" width="100%" />
+          <img class="full-image" ng-src="data:image/jpeg;base64,{{image}}" width="100%" />
         </div>
       </ion-item>
       <br>

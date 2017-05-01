@@ -4,7 +4,7 @@
 
 
     <div align="center" ng-controller="MyProfileCtrl">
-      <img src="{{user.photoURL}}">
+      <img src="data:image/jpeg;base64,{{user.photoURL}}" class="img-circle" width="100%">
     </div>
     <ion-item class="padding" ng-controller="ImageCtrl">
       <div align="center">
@@ -13,6 +13,7 @@
         </button>
       </div>
     </ion-item>
+    <img ng-src="data:image/jpeg;base64,{{images[images.length - 1]}}" width="100%" />
 
 
     <div class="bottom">
@@ -38,7 +39,7 @@
     <div ng-repeat="review in myReviewsList | orderBy:'-'">
       <br>
       <ion-item class="item-avatar" ng-controller="MyProfileCtrl" ng-click="goToUser(review)">
-        <img src={{review.photoURL}} />
+        <img src="data:image/jpeg;base64,{{review.photoURL}}" />
         <h2>{{review.displayName}}</h2>
         <h2>Rating: {{review.rating}}/5</h2>
         <p>{{review.time}}</p>
