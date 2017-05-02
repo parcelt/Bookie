@@ -88,6 +88,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.myProfile', {
+        cache: false,
         url: '/myProfile',
         views: {
           'menuContent': {

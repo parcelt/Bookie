@@ -1,12 +1,9 @@
 <ion-view view-title="Chat With {{displayName}}">
-  <header class="clearfix">
-    <h4>{{displayName}}</h4>
-  </header>
   <!--<ion-content id="live-chat">-->
-    <div id="live-chat">
-      <div class="chat-history">
-        <div class="chat-message clearfix"  ng-repeat="chat in chatStream" ng-click="goToUser(chat)">
-          <img class="profilePic" src={{chat.photoURL}} alt="" width="32" height="32">
+    <div id="live-chat" ng-controller="ChatUserCtrl">
+      <div class="chat-history" schroll-bottom="chatStream">
+        <div class="chat-message clearfix"  ng-repeat="chat in chatStream" ng-if="chat.$id !== 'recent' && chat.$id !== 'displayName'" ng-click="goToUser(chat)">
+          <img class="profilePic" src="data:image/jpeg;base64,{{chat.photoURL}}" alt="" width="32" height="32">
           <div class="chat-message-content clearfix">
             <span class="chat-time">{{chat.time}}</span>
             <h5>{{chat.displayName}}</h5>
@@ -19,9 +16,9 @@
       <form ng-submit="onSend()">
         <fieldset>
           <input class="chatBox" id="chatBox" type="text" placeholder="Type your message…" autofocus>
-          <button class="button button-positive" type="submit">
-            Send
-          </button>
+          <!--<button class="button button-positive" type="submit">-->
+            <!--Send-->
+          <!--</button>-->
         </fieldset>
       </form>
     </div> <!-- end chat -->

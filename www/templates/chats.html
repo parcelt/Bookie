@@ -1,19 +1,38 @@
 <ion-view view-title="Chats">
   <ion-content>
 
-    <div class="bottom">
+    <div class="bottom" ng-controller="ChatsCtrl">
       <div style="float: left; width: 100%;">
         <label class="item item-input">
           <i class="icon ion-search placeholder-icon"></i>
           <input type="text" name="search" id="searchChats-textarea"
-                 ng-model="$parent.search" placeholder="Search">
+                 placeholder="Search" ng-keyup="onSearch(this.value)">
         </label>
       </div>
     </div>
 
-    <ul>
-      <li class="button button-full" ng-repeat="chat in chats" ng-click="onSelectChat(chat)">
-        Name: {{selectedChat.name}} <br>Posted at: {{selectedChat.time}} <br>Content: {{selectedChat.content}}</li>
-    </ul>
+    <!--<ul>-->
+      <!--<li class="button button-full" ng-repeat="chat in chats" ng-click="onSelectChat(chat)">-->
+        <!--Name: {{chat[chat.length()-1].displayName}} <br>Posted at: {{chat.time}} <br>Content: {{chat.content}}-->
+      <!--</li>-->
+    <!--</ul>-->
+    <div id="all" class="chat-message clearfix"  ng-repeat="chat in chats" ng-click="onSelectChat(chat)" ng-controller="ChatsCtrl">
+      <img class="profilePic" src="data:image/jpeg;base64,{{convoData[chat.$id].photoURL}}" alt="" width="32" height="32">
+      <div class="chat-message-content clearfix">
+        <span class="chat-time">{{chat.recent.time}}</span>
+        <h5>{{convoData[chat.$id].displayName}}</h5>
+        <p class="message">{{chat.recent.message}}</p>
+      </div>
+      <hr>
+    </div>
+    <div id="results" style="display: none" class="chat-message clearfix"  ng-repeat="chat in chats" ng-click="onSelectChat(chat)" ng-controller="ChatsCtrl">
+      <img class="profilePic" src="data:image/jpeg;base64,{{convoData[chat.$id].photoURL}}" alt="" width="32" height="32">
+      <div class="chat-message-content clearfix">
+        <span class="chat-time">{{chat.recent.time}}</span>
+        <h5>{{convoData[chat.$id].displayName}}</h5>
+        <p class="message">{{chat.recent.message}}</p>
+      </div>
+      <hr>
+    </div>
   </ion-content>
 </ion-view>

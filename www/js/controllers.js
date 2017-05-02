@@ -1,22 +1,18 @@
 angular.module('bookie.controllers', ['firebase'])
 
-  // Generic item factory for posts and the like
-  .factory('Item', function() {
-    return function(index, name, time, content) {
-      this.index = index;
-      this.name = name;
-      this.time = time;
-      this.content = content;
-    }
-  })
-
-  // Factory for reviews
-  .factory('Review', function() {
-    return function(index, name, rating, content) {
-      this.index = index;
-      this.name = name;
-      this.rating = rating;
-      this.content = content;
+  .directive('schrollBottom', function () {
+    return {
+      scope: {
+        schrollBottom: "="
+      },
+      link: function (scope, element) {
+        scope.$watchCollection('schrollBottom', function (newValue) {
+          if (newValue)
+          {
+            $(element).scrollTop($(element)[0].scrollHeight);
+          }
+        });
+      }
     }
   })
 
@@ -43,10 +39,10 @@ angular.module('bookie.controllers', ['firebase'])
           }
           console.log(error);
         });
-    }
+    };
     $scope.onCreateAccount = function() {
       $scope.createAccount();
-    }
+    };
 
     // Form data for the login modal
     $scope.createAccountData = {};
@@ -131,20 +127,47 @@ angular.module('bookie.controllers', ['firebase'])
       }
     };
   })
-  .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $firebaseArray) {
+  .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
     $scope.user = firebase.auth().currentUser;
-    var chatsRef = firebase.database().ref('/user/' + $scope.user.uid + '/chats');
+    var chatsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/chats');
     $scope.chats = $firebaseArray(chatsRef);
-    $scope.onSearch = function() {
 
+    $scope.convoData = {};
+    $scope.chats.$loaded()
+      .then(function() {
+        angular.forEach($scope.chats, function (chat) {
+          firebase.database().ref('/user/' + chat.$id).once('value').then(function(snapshot) {
+            $scope.convoData[chat.$id] = {
+              'uid': snapshot.val().uid,
+              'displayName': snapshot.val().displayName,
+              'email': snapshot.val().email,
+              'photoURL': snapshot.val().photoURL
+            };
+          });
+        });
+      });
+
+    $scope.onSearch = function(queryText) {
+      // $scope.results = $firebaseArray(chatsRef.orderByChild('displayName')
+      //   .startAt(queryText)
+      //   .endAt(queryText+"\uf8ff"));
+      // $scope.results.$loaded()
+      //   .then(function() {
+      //     document.getElementById('all').style.display = 'none';
+      //     document.getElementById('results').style.display = 'visible';
+      //   })
     };
 
-    $scope.onSelectChat = function(selectedChat) {
-      $ionicViewSwitcher.nextDirection('forward');
+    $scope.onSelectChat = function(chat) {
+
+      $ionicViewSwitcher.nextDirection('enter');
       $state.go('app.chatUser', {
-        'user': selectedChat.name
+        'uid': $scope.convoData[chat.$id].uid,
+        'displayName': $scope.convoData[chat.$id].displayName,
+        'email': $scope.convoData[chat.$id].email,
+        'photoURL': $scope.convoData[chat.$id].photoURL
       });
-    }
+    };
   })
 
   .controller('ChatUserCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams, $firebaseArray) {
@@ -160,28 +183,31 @@ angular.module('bookie.controllers', ['firebase'])
       var currentdate = new Date();
       if(chatBox !== "") {
         console.log('Doing send');
+        var updates = {};
+        var chatData = {
+          uid: $rootScope.user.uid,
+          displayName: $rootScope.user.displayName,
+          email: $rootScope.user.email,
+          photoURL: $rootScope.user.photoURL,
+          time: currentdate.toLocaleString(),
+          message: chatBox
+        };
         var myChatFolder = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/'
           + (Math.round(currentdate.getTime() / 1000)).toString();
-        firebase.database().ref(myChatFolder).set(
-          {
-            uid: $rootScope.user.uid,
-            displayName: $rootScope.user.displayName,
-            email: $rootScope.user.email,
-            photoURL: $rootScope.user.photoURL,
-            time: currentdate.toLocaleString(),
-            message: chatBox
-          });
         var otherChatFolder = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/'
           + (Math.round(currentdate.getTime() / 1000)).toString();
-        firebase.database().ref(otherChatFolder).set(
-          {
-            uid: $rootScope.user.uid,
-            displayName: $rootScope.user.displayName,
-            email: $rootScope.user.email,
-            photoURL: $rootScope.user.photoURL,
-            time: currentdate.toLocaleString(),
-            message: chatBox
-          });
+        var myRecent = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/recent';
+        var otherRecent = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/recent';
+        var myDisplayName = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/displayName';
+        var otherDisplayName = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/displayName';
+        updates[myChatFolder] = chatData;
+        updates[otherChatFolder] = chatData;
+        updates[myRecent] = chatData;
+        updates[otherRecent] = chatData;
+        updates[myDisplayName] = $stateParams.displayName;
+        updates[otherDisplayName] = $rootScope.user.displayName;
+        firebase.database().ref().update(updates);
+
         console.log("Chat successfully stored");
         textarea.value = "";
         //$state.go($state.current, {}, {reload: true});
@@ -199,7 +225,7 @@ angular.module('bookie.controllers', ['firebase'])
     // });
 
     $scope.goToUser = function(message) {
-      if(message.uid === $scope.user.uid) {
+      if(message.uid === $rootScope.user.uid) {
         $ionicViewSwitcher.nextDirection('exit');
         $state.go('app.myProfile');
       }
@@ -234,7 +260,7 @@ angular.module('bookie.controllers', ['firebase'])
 
     $scope.onSearch = function() {
 
-    }
+    };
 
     $scope.onSelectPost = function(post) {
       $ionicViewSwitcher.nextDirection('forward');
@@ -246,7 +272,7 @@ angular.module('bookie.controllers', ['firebase'])
     }
   })
 
-  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams, $firebaseArray) {
+  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams, $firebaseArray) {
     $scope.parseJSON = function(raw) {
       return JSON.parse(raw);
     };
@@ -265,12 +291,6 @@ angular.module('bookie.controllers', ['firebase'])
       var textarea = document.getElementById("editMessage");
       var postMessage = textarea.value;
       var currentdate = new Date();
-      var datetime = "Last Sync: " + currentdate.getDate() + "/"
-        + (currentdate.getMonth()+1)  + "/"
-        + currentdate.getFullYear() + " @ "
-        + currentdate.getHours() + ":"
-        + currentdate.getMinutes() + ":"
-        + currentdate.getSeconds();
       if(postMessage !== "") {
         console.log('Doing post');
         firebase.database().ref(location).set(
@@ -294,17 +314,17 @@ angular.module('bookie.controllers', ['firebase'])
       }
       $ionicViewSwitcher.nextDirection('back');
       $state.go('app.posts');
-    }
+    };
 
     $scope.onDeletePhotos = function() {
       $rootScope.images = [];
-    }
+    };
 
     $scope.onDeletePost = function() {
       firebase.database().ref(location).remove();
       $ionicViewSwitcher.nextDirection('back');
       $state.go('app.posts');
-    }
+    };
 
     $('textarea').each(function () {
       this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
@@ -318,7 +338,7 @@ angular.module('bookie.controllers', ['firebase'])
     });
   })
 
-  .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $firebaseArray) {
+  .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
 
     var reviewsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/reviews/');
     $scope.myReviewsList = $firebaseArray(reviewsRef);
@@ -370,7 +390,7 @@ angular.module('bookie.controllers', ['firebase'])
         .catch(function(error) {
           console.log("Error: ", error);
         });
-    }
+    };
 
     $scope.findUsers = function(name, photoURL) {
       var currRef = firebase.database().ref('/user/');
@@ -379,13 +399,13 @@ angular.module('bookie.controllers', ['firebase'])
         .then(function() {
           for(var i = 0; i < list.length; i++) {
             $scope.updateReviews(list[i].$id, name, photoURL);
-            // TODO: $scope.updateChats(list[i].$id, name, photoURL);
+            $scope.updateChats(list[i].$id, name, photoURL);
           }
         })
         .catch(function(error) {
           console.log("Error: ", error);
         });
-    }
+    };
 
     $scope.updateReviews = function(id, name, photoURL) {
       var currRef = firebase.database().ref('/user/' + id + '/reviews/');
@@ -402,7 +422,39 @@ angular.module('bookie.controllers', ['firebase'])
         .catch(function(error) {
           console.log("Error: ", error);
         });
-    }
+    };
+
+    $scope.updateChats = function(id, name, photoURL) {
+      var currRef = firebase.database().ref('/user/' + id + '/chats/' + $rootScope.user.uid);
+      var query = currRef.orderByChild("uid").equalTo($rootScope.user.uid);
+      var list = $firebaseArray(query);
+      list.$loaded()
+        .then(function() {
+          for(var i = 0; i < list.length; i++) {
+            list[i].displayName = name;
+            list[i].photoURL = photoURL;
+            list.$save(i);
+          }
+        })
+        .catch(function(error) {
+          console.log("Error: ", error);
+        });
+
+      var currRef2 = firebase.database().ref('/user/' + $rootScope.user.uid + '/chats/' + id);
+      var query2 = currRef2.orderByChild("uid").equalTo($rootScope.user.uid);
+      var list2 = $firebaseArray(query2);
+      list2.$loaded()
+        .then(function() {
+          for(var i = 0; i < list2.length; i++) {
+            list2[i].displayName = name;
+            list2[i].photoURL = photoURL;
+            list2.$save(i);
+          }
+        })
+        .catch(function(error) {
+          console.log("Error: ", error);
+        });
+    };
 
     $scope.onSaveChanges = function() {
       var name = document.getElementById("myName-textarea").value;
@@ -423,10 +475,11 @@ angular.module('bookie.controllers', ['firebase'])
 
         console.log("Update queued");
         $rootScope.images = []; // Empty images
+        $state.go($state.current, {}, {reload: true});
       }).catch(function(error) {
         alert(error.message);
         console.log(error);
-      })
+      });
       $rootScope.images = []; // Empty images
     };
 
@@ -451,14 +504,14 @@ angular.module('bookie.controllers', ['firebase'])
         'email': review.email,
         'photoURL': review.photoURL
       });
-    }
+    };
 
     $scope.$on('$ionicView.beforeLeave', function() {
       $rootScope.images = [];
     });
   })
 
-  .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Review, $stateParams, $firebaseArray) {
+  .controller('UserProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams, $firebaseArray) {
     $scope.user = firebase.auth().currentUser;
 
     var reviewsRef = firebase.database().ref('/user/' + $stateParams.uid + '/reviews/');
@@ -683,7 +736,7 @@ angular.module('bookie.controllers', ['firebase'])
         destinationType: navigator.camera.DestinationType.DATA_URL,
         sourceType: navigator.camera.PictureSourceType.CAMERA,
         allowEdit: true,
-        encodingType: navigator.camera.EncodingType.PNG,
+        encodingType: navigator.camera.EncodingType.JPEG,
         targetWidth: 640,
         targetHeight: 640,
         popoverOptions: navigator.camera.PopoverArrowDirection.ARROW_UP,

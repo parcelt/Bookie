@@ -4,9 +4,9 @@
       <ion-item class="item-avatar" id="postHeader" ng-controller="HomeCtrl">
         <img src="data:image/jpeg;base64,{{user.photoURL}}" style="width:40px;height:40px">
         <h2>
-          <textarea id="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
+          <textarea id="postMessage" style="width:100%;display:inline" placeholder="Want to post?"></textarea>
+          <button class="button button-positive post" ng-click="doPost()">Post!</button>
         </h2>
-        <button class="button button-block button-positive col col-25 post" ng-click="doPost()">Post!</button>
       </ion-item>
       <ion-item class="padding" ng-controller="ImageCtrl">
         <ion-item class="item-icon-left">

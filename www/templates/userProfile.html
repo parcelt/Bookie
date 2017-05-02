@@ -2,7 +2,7 @@
   <ion-content>
 
     <div align="center">
-      <img src="data:image/jpeg;base64,{{photoURL}}" class="img-circle">
+      <img src="data:image/jpeg;base64,{{photoURL}}" class="profilePic">
     </div>
 
     <div class="bottom">
@@ -22,22 +22,22 @@
     <ion-item class="item-avatar" id="reviewHeader" ng-controller="UserProfileCtrl">
       <h2>
         <textarea id="reviewMessage" style="width:100%" placeholder="Want to leave a review?"></textarea>
-        <input type="radio" name="ratingList" ng-model='rating' id="one" value='1'>
-        <label for="one">1</label>
-
-        <input type="radio" name="ratingList" ng-model='rating' id="two" value='2'>
-        <label for="two">2</label>
-
-        <input type="radio" name="ratingList" ng-model='rating' id="three" value='3'>
-        <label for="three">3</label>
-
-        <input type="radio" name="ratingList" ng-model='rating' id="four" value='4'>
-        <label for="four">4</label>
-
-        <input type="radio" name="ratingList" ng-model='rating' id="five" value='5'>
-        <label for="five">5</label>
+        <button class="button button-block button-positive col col-25 post" ng-click="doReview()">Submit</button>
       </h2>
-      <button class="button button-block button-positive col col-25 post" ng-click="doReview()">Submit</button>
+      <input type="radio" name="ratingList" ng-model='rating' id="one" value='1'>
+      <label for="one">1</label>
+
+      <input type="radio" name="ratingList" ng-model='rating' id="two" value='2'>
+      <label for="two">2</label>
+
+      <input type="radio" name="ratingList" ng-model='rating' id="three" value='3'>
+      <label for="three">3</label>
+
+      <input type="radio" name="ratingList" ng-model='rating' id="four" value='4'>
+      <label for="four">4</label>
+
+      <input type="radio" name="ratingList" ng-model='rating' id="five" value='5'>
+      <label for="five">5</label>
     </ion-item>
     <div ng-repeat="review in userReviewsList | orderBy:'-'">
       <br>
