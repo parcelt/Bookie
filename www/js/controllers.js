@@ -1,4 +1,4 @@
-angular.module('bookie.controllers', ["firebase"])
+angular.module('bookie.controllers', ['firebase'])
 
   // Generic item factory for posts and the like
   .factory('Item', function() {
@@ -113,27 +113,10 @@ angular.module('bookie.controllers', ["firebase"])
     }
   })
 
-  .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item) {
-    $scope.chats = {};
-
-    $scope.index_t1 = 0;
-    $scope.name_t1 = "Bill";
-    $scope.time_t1 = "1:24pm";
-    $scope.content_t1 = "I'll meet you there.";
-    $scope.index_t2 = 1;
-    $scope.name_t2 = "John";
-    $scope.time_t2 = "12:07pm";
-    $scope.content_t2 = "I got this thing to get rid of.";
-
-    $scope.init = function() {
-      var chat_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
-      var chat_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
-      $scope.chats[0] = chat_t1;
-      $scope.chats[1] = chat_t2;
-    }
-    $scope.init();
-
-
+  .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $firebaseArray) {
+    $scope.user = firebase.auth().currentUser;
+    var chatsRef = firebase.database().ref('/user/' + $scope.user.uid + '/chats');
+    $scope.chats = $firebaseArray(chatsRef);
     $scope.onSearch = function() {
 
     }
@@ -146,43 +129,71 @@ angular.module('bookie.controllers', ["firebase"])
     }
   })
 
-  .controller('ChatUserCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, Item, $stateParams) {
-    $scope.chatStream = {};
-    $scope.displayName = $stateParams.user;
-
-    // Fill chatStream via Firebase TODO: Firebase
-    $scope.index_t1 = 0;
-    $scope.name_t1 = $scope.user;
-    $scope.time_t1 = "1:24pm";
-    $scope.content_t1 = "I'll meet you there.";
-    $scope.index_t2 = 1;
-    $scope.name_t2 = $scope.user;
-    $scope.time_t2 = "1:20";
-    $scope.content_t2 = "Okay, sounds good.";
-    $scope.index_t3 = 2;
-    $scope.name_t3 = firebase.auth().currentUser.displayName;
-    $scope.time_t3 = "12:08";
-    $scope.content_t3 = "Your post. I'll take it. Can you get to that one place at the time and stuff?"
-
-    $scope.init = function() {
-      var chatStream_t1 = new Item($scope.index_t1, $scope.name_t1, $scope.time_t1, $scope.content_t1);
-      var chatStream_t2 = new Item($scope.index_t2, $scope.name_t2, $scope.time_t2, $scope.content_t2);
-      var chatStream_t3 = new Item($scope.index_t3, $scope.name_t3, $scope.time_t3, $scope.content_t3);
-      $scope.chatStream[0] = chatStream_t1;
-      $scope.chatStream[1] = chatStream_t2;
-      $scope.chatStream[2] = chatStream_t3;
-    };
-    $scope.init();
-
-    $scope.onSelectMessage = function(selectedMessage) {
-      $ionicViewSwitcher.nextDirection('forward');
-      $state.go('app.userProfile', {
-        'user': selectedMessage.name
-      });
-    };
+  .controller('ChatUserCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams, $firebaseArray) {
+    $scope.user = firebase.auth().currentUser;
+    var chatsRef = firebase.database().ref('/user/' + $scope.user.uid + '/chats/' + $stateParams.uid);
+    $scope.chatStream = $firebaseArray(chatsRef);
+    $scope.displayName = $stateParams.displayName;
 
     $scope.onSend = function() {
-      //TODO: Add to top of chatStream
+      $rootScope.user = firebase.auth().currentUser;
+      var textarea = document.getElementById("chatBox");
+      var chatBox = textarea.value;
+      var currentdate = new Date();
+      if(chatBox !== "") {
+        console.log('Doing send');
+        var myChatFolder = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/'
+          + (Math.round(currentdate.getTime() / 1000)).toString();
+        firebase.database().ref(myChatFolder).set(
+          {
+            uid: $rootScope.user.uid,
+            displayName: $rootScope.user.displayName,
+            email: $rootScope.user.email,
+            photoURL: $rootScope.user.photoURL,
+            time: currentdate.toLocaleString(),
+            message: chatBox
+          });
+        var otherChatFolder = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/'
+          + (Math.round(currentdate.getTime() / 1000)).toString();
+        firebase.database().ref(otherChatFolder).set(
+          {
+            uid: $rootScope.user.uid,
+            displayName: $rootScope.user.displayName,
+            email: $rootScope.user.email,
+            photoURL: $rootScope.user.photoURL,
+            time: currentdate.toLocaleString(),
+            message: chatBox
+          });
+        console.log("Chat successfully stored");
+        textarea.value = "";
+        //$state.go($state.current, {}, {reload: true});
+      }
+      else {
+        alert("Chat box must contain input in order to send.");
+      }
+    };
+
+    // $('textarea').each(function () {
+    //   this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+    // }).on('input', function () {
+    //   this.style.height = 'auto';
+    //   this.style.height = (this.scrollHeight) + 'px';
+    // });
+
+    $scope.goToUser = function(message) {
+      if(message.uid === $scope.user.uid) {
+        $ionicViewSwitcher.nextDirection('exit');
+        $state.go('app.myProfile');
+      }
+      else {
+        $ionicViewSwitcher.nextDirection('exit');
+        $state.go('app.userProfile', {
+          'uid': message.uid,
+          'displayName': message.displayName,
+          'email': message.email,
+          'photoURL': message.photoURL
+        });
+      }
     }
   })
 
@@ -226,7 +237,7 @@ angular.module('bookie.controllers', ["firebase"])
     $scope.images = [];
     var location = '/posts/' + $stateParams.key;
     firebase.database().ref(location).once("value", function(snap) {
-      if(snap.val() != null) $scope.post = snap.val();
+      if(snap.val() !== null) $scope.post = snap.val();
       $scope.images = $scope.parseJSON($scope.post.images);
       document.getElementById("editMessage").style.height = 'auto';
       document.getElementById("editMessage").style.height = (this.scrollHeight) + 'px';
@@ -362,7 +373,7 @@ angular.module('bookie.controllers', ["firebase"])
       });
 
     $scope.onMessage = function() {
-      $ionicViewSwitcher.nextDirection('forward');
+      $ionicViewSwitcher.nextDirection('enter');
       $state.go('app.chatUser', {
         'uid': $scope.uid,
         'displayName': $scope.displayName,
@@ -482,7 +493,7 @@ angular.module('bookie.controllers', ["firebase"])
 
     var postsRef = firebase.database().ref('/posts/');
     $scope.postsList = $firebaseArray(postsRef);
-
+    $scope.limit = 5;
     $scope.doPost = function() {
       $rootScope.user = firebase.auth().currentUser;
       var textarea = document.getElementById("postMessage");
@@ -540,6 +551,9 @@ angular.module('bookie.controllers', ["firebase"])
       }
     }
 
+    $scope.loadMore = function() {
+      $scope.limit += 5;
+    }
   })
 
   .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {

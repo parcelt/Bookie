@@ -12,7 +12,7 @@
     </div>
 
     <ul>
-      <li class="button button-full" ng-repeat="selectedChat in chats" ng-click="onSelectChat(selectedChat)">
+      <li class="button button-full" ng-repeat="chat in chats" ng-click="onSelectChat(chat)">
         Name: {{selectedChat.name}} <br>Posted at: {{selectedChat.time}} <br>Content: {{selectedChat.content}}</li>
     </ul>
   </ion-content>
