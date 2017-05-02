@@ -2,7 +2,7 @@
   <ion-content>
     <ion-list>
       <ion-item class="item-avatar" id="postHeader" ng-controller="HomeCtrl">
-        <img src={{user.photoURL}} style="width:40px;height:40px">
+        <img src="data:image/jpeg;base64,{{user.photoURL}}" style="width:40px;height:40px">
         <h2>
           <textarea id="postMessage" style="width:100%" placeholder="Want to post?"></textarea>
         </h2>
@@ -17,16 +17,16 @@
         <ion-scroll>
           <div class="row" ng-repeat="image in images" ng-if="$index % 4 === 0">
             <div class="col col-25" ng-if="$index < images.length">
-              <img ng-src="data:image/png;base64,{{images[$index]}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 1 < images.length">
-              <img ng-src="data:image/png;base64,{{images[$index + 1]}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 1]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 2 < images.length">
-              <img ng-src="data:image/png;base64,{{images[$index + 2]}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 2]}}" width="100%" />
             </div>
             <div class="col col-25" ng-if="$index + 3 < images.length">
-              <img ng-src="data:image/png;base64,{{images[$index + 3]}}" width="100%" />
+              <img ng-src="data:image/jpeg;base64,{{images[$index + 3]}}" width="100%" />
             </div>
           </div>
         </ion-scroll>
@@ -35,7 +35,7 @@
       <div ng-repeat="post in postsList | orderBy:'-' | limitTo: limit">
         <br>
         <ion-item class="item-avatar" ng-controller="HomeCtrl" ng-click="goToUser(post)">
-          <img src={{post.photoURL}} />
+          <img src="data:image/jpeg;base64,{{post.photoURL}}" />
           <h2>{{post.displayName}}</h2>
           <p>{{post.time}}</p>
         </ion-item>
@@ -44,7 +44,7 @@
             {{post.message}}
           </p>
           <div ng-repeat="image in parseJSON(post.images)">
-            <img class="full-image" ng-src="data:image/png;base64,{{image}}" width="100%" />
+            <img class="full-image" ng-src="data:image/jpeg;base64,{{image}}" width="100%" />
           </div>
         </ion-item>
         <br>

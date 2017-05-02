@@ -1,5 +1,19 @@
-<ion-view view-title="Settings">
+<ion-view view-title="Settings" ng-controller="SettingsCtrl">
   <ion-content>
-    <h1>Settings</h1>
+    <form ng-submit="doUpdatePassword()">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">New Password</span>
+          <input id="newPassword" type="password">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Confirm New Password</span>
+          <input id="newPasswordConfirm" type="password">
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">Submit!</button>
+        </label>
+      </div>
+    </form>
   </ion-content>
 </ion-view>

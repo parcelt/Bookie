@@ -2,7 +2,7 @@
   <ion-content>
 
     <div align="center">
-      <img src={{user.photoURL}}>
+      <img src="data:image/jpeg;base64,{{photoURL}}" class="img-circle">
     </div>
 
     <div class="bottom">
@@ -42,7 +42,7 @@
     <div ng-repeat="review in userReviewsList | orderBy:'-'">
       <br>
       <ion-item class="item-avatar" ng-controller="UserProfileCtrl" ng-click="goToUser(review)">
-        <img src={{review.photoURL}} />
+        <img src="data:image/jpeg;base64,{{review.photoURL}}" />
         <h2>{{review.displayName}}</h2>
         <h2>Rating: {{review.rating}}/5</h2>
         <p>{{review.time}}</p>
