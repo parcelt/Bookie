@@ -68,8 +68,6 @@ angular.module('bookie.controllers', ['firebase'])
       firebase.auth()
         .createUserWithEmailAndPassword($scope.createAccountData.email, $scope.createAccountData.password)
         .then(function() {
-          //$ionicViewSwitcher.nextDirection('back');
-          //$state.go('login');
           $timeout(function() {
             $scope.closeCreateAccount();
           }, 1000);
@@ -79,7 +77,6 @@ angular.module('bookie.controllers', ['firebase'])
           var user = firebase.auth().currentUser;
             user.updateProfile({
               displayName: $scope.createAccountData.username,
-              //photoURL: "http://i.ebayimg.com/images/g/aJUAAOSwT6pVw1wO/s-l300.jpg"
               photoURL: $rootScope.defaultImg
             }).then(function() {
               console.log("Update successful");
@@ -128,9 +125,8 @@ angular.module('bookie.controllers', ['firebase'])
     };
   })
   .controller('ChatsCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
-    $scope.user = firebase.auth().currentUser;
     var chatsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/chats');
-    $scope.chats = $firebaseArray(chatsRef);
+    $scope.chats = $firebaseArray(chatsRef.orderByChild("time"));
 
     $scope.convoData = {};
     $scope.chats.$loaded()
@@ -146,17 +142,6 @@ angular.module('bookie.controllers', ['firebase'])
           });
         });
       });
-
-    $scope.onSearch = function(queryText) {
-      // $scope.results = $firebaseArray(chatsRef.orderByChild('displayName')
-      //   .startAt(queryText)
-      //   .endAt(queryText+"\uf8ff"));
-      // $scope.results.$loaded()
-      //   .then(function() {
-      //     document.getElementById('all').style.display = 'none';
-      //     document.getElementById('results').style.display = 'visible';
-      //   })
-    };
 
     $scope.onSelectChat = function(chat) {
 
@@ -198,14 +183,14 @@ angular.module('bookie.controllers', ['firebase'])
           + (Math.round(currentdate.getTime() / 1000)).toString();
         var myRecent = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/recent';
         var otherRecent = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/recent';
-        var myDisplayName = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/displayName';
-        var otherDisplayName = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/displayName';
+        var myTime = '/user/' + $rootScope.user.uid + '/chats/' + $stateParams.uid + '/time';
+        var otherTime = '/user/' + $stateParams.uid + '/chats/' + $rootScope.user.uid + '/time';
         updates[myChatFolder] = chatData;
         updates[otherChatFolder] = chatData;
         updates[myRecent] = chatData;
         updates[otherRecent] = chatData;
-        updates[myDisplayName] = $stateParams.displayName;
-        updates[otherDisplayName] = $rootScope.user.displayName;
+        updates[myTime] = chatData.time;
+        updates[otherTime] = chatData.time;
         firebase.database().ref().update(updates);
 
         console.log("Chat successfully stored");
@@ -216,13 +201,6 @@ angular.module('bookie.controllers', ['firebase'])
         alert("Chat box must contain input in order to send.");
       }
     };
-
-    // $('textarea').each(function () {
-    //   this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-    // }).on('input', function () {
-    //   this.style.height = 'auto';
-    //   this.style.height = (this.scrollHeight) + 'px';
-    // });
 
     $scope.goToUser = function(message) {
       if(message.uid === $rootScope.user.uid) {
@@ -245,14 +223,6 @@ angular.module('bookie.controllers', ['firebase'])
     var postsRef = firebase.database().ref('/posts/');
     var query = postsRef.orderByChild("uid").equalTo($rootScope.user.uid);
     $scope.postsList = $firebaseArray(query);
-    /*$scope.postsList.$loaded()
-      .then(function() {
-      console.log("length = " + $scope.postsList.length);
-    })
-    .catch(function(error) {
-      console.log("Error: ", error);
-    })
-    console.log($rootScope.user.uid);*/
 
     $scope.parseJSON = function(raw) {
       return JSON.parse(raw);
@@ -272,7 +242,7 @@ angular.module('bookie.controllers', ['firebase'])
     }
   })
 
-  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams, $firebaseArray) {
+  .controller('EditPostCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $stateParams) {
     $scope.parseJSON = function(raw) {
       return JSON.parse(raw);
     };
@@ -338,6 +308,46 @@ angular.module('bookie.controllers', ['firebase'])
     });
   })
 
+  .controller('SearchCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
+    $scope.userLimit = 5;
+    $scope.postLimit = 5;
+
+    $scope.onSearch = function() {
+      var queryText = document.getElementById("searchBar").value;
+      var userRef = firebase.database().ref('/user/');
+      $scope.userResults = $firebaseArray(userRef.orderByChild("displayName").startAt(queryText).endAt(queryText + "\uf8ff"));
+      var postRef = firebase.database().ref('/posts/');
+      $scope.postResults = $firebaseArray(postRef.orderByChild("message").startAt(queryText).endAt(queryText + "\uf8ff"));
+    };
+
+    $scope.goToUser = function(result) {
+      if(result.uid === $rootScope.user.uid) {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.myProfile');
+      }
+      else {
+        $ionicViewSwitcher.nextDirection('forward');
+        $state.go('app.userProfile', {
+          'uid': result.uid,
+          'displayName': result.displayName,
+          'email': result.email,
+          'photoURL': result.photoURL
+        });
+      }
+    };
+
+    $scope.parseJSON = function(raw) {
+      return JSON.parse(raw);
+    };
+
+    $scope.loadMoreUsers = function() {
+      $scope.userLimit += 5;
+    };
+    $scope.loadMorePosts = function() {
+      $scope.postLimit += 5;
+    };
+  })
+
   .controller('MyProfileCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
 
     var reviewsRef = firebase.database().ref('/user/' + $rootScope.user.uid + '/reviews/');
@@ -349,22 +359,6 @@ angular.module('bookie.controllers', ['firebase'])
     $scope.ratingCount = 0.0;
     $scope.ratingAve = 0;
 
-    /*$scope.$watch(function() {
-      return $rootScope.images;
-    }, function() {
-      $scope.photo = $rootScope.images[0];
-      $rootScope.images = [];
-    });*/
-
-    /*$scope.init = function() {
-      angular.forEach($scope.myReviewsList, function(review) {
-        $scope.ratingTotal += parseFloat(review.rating, 10);
-        $scope.ratingCount++;
-      });
-
-      $scope.ratingAve = $scope.ratingTotal / $scope.ratingCount;
-    };
-    $scope.init();*/
     $scope.myReviewsList.$loaded()
       .then(function(){
         angular.forEach($scope.myReviewsList, function(review) {
@@ -483,19 +477,6 @@ angular.module('bookie.controllers', ['firebase'])
       $rootScope.images = []; // Empty images
     };
 
-//    $scope.user = firebase.auth().currentUser;
-//
-//    var ref = firebase.database().ref('/user/' + user.uid)
-//    ref.once("value")
-//      .then(function(snapshot) {
-//        var hasName = snapshot.hasChild("reviews"); // true
-//    });
-//
-//    if (hasName){
-//       var reviewsRef = firebase.database().ref('/user/reviews');
-//       $scope.myReviewsList = $firebaseArray(reviewsRef);
-//    }
-
     $scope.goToUser = function(review) {
       $ionicViewSwitcher.nextDirection('forward');
       $state.go('app.userProfile', {
@@ -602,13 +583,6 @@ angular.module('bookie.controllers', ['firebase'])
   })
 
   .controller('AppCtrl', function($rootScope, $scope, $ionicModal, $ionicViewSwitcher, $timeout, $state) {
-
-    // With the new view caching in Ionic, Controllers are only called
-    // when they are recreated or on app start, instead of every page change.
-    // To listen for when this page is active (for example, to refresh data),
-    // listen for the $ionicView.enter event:
-    //$scope.$on('$ionicView.enter', function(e) {
-    //});
 
     $scope.user = firebase.auth().currentUser;
 
@@ -724,13 +698,10 @@ angular.module('bookie.controllers', ['firebase'])
     };
   })
 
-  .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera, $cordovaFile) {
-    //The scope array is used for our ng-repeat to store the links to the images
-    //$rootScope.images = [];
+  .controller('ImageCtrl', function($rootScope, $scope, $cordovaCamera) {
 
     $scope.addImage = function() {
-      // The options array is passed to the cordovaCamera with specific options.
-      // For more options see the official docs for cordova camera.
+
       var options = {
         quality: 50,
         destinationType: navigator.camera.DestinationType.DATA_URL,
@@ -743,77 +714,14 @@ angular.module('bookie.controllers', ['firebase'])
         saveToPhotoAlbum: false,
         correctOrientation:true
       };
-
-      // Call the ngCordova module cordovaCamera we injected to our controller
       $cordovaCamera.getPicture(options).then(function(imageData) {
 
         $rootScope.images.push(imageData);
-
-        // When the image capture returns data, we pass the information to our success function,
-        // which will call some other functions to copy the original image to our app folder.
-
-        //onImageSuccess(imageData);
-
-        function onImageSuccess(fileURI) {
-          createFileEntry(fileURI);
-        }
-
-        function createFileEntry(fileURI) {
-          window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
-        }
-
-        // This function copies the original file to our app directory. As we might have to deal with duplicate images,
-        // we give a new name to the file consisting of a random string and the original name of the image.
-        function copyFile(fileEntry) {
-          var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
-          var newName = makeid() + name;
-
-          window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
-              fileEntry.copyTo(
-                fileSystem2,
-                newName,
-                onCopySuccess,
-                fail
-              );
-            },
-            fail);
-        }
-
-        // If the copy task finishes successful, we push the image url to our scope array of images.
-        // Make sure to use the apply() function to update the scope and view!
-        function onCopySuccess(entry) {
-          $scope.$apply(function () {
-            $rootScope.images.push(entry.nativeURL);
-          });
-        }
-
-        function fail(error) {
-          console.log("fail: " + error.code);
-        }
-
-        function makeid() {
-          var text = "";
-          var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-          for (var i=0; i < 5; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-          }
-          return text;
-        }
 
       }, function(err) {
         console.log(err);
       });
     };
 
-    $scope.urlForImage = function(imageName) {
-      var name = imageName.substr(imageName.lastIndexOf('/') + 1);
-      var trueOrigin = cordova.file.dataDirectory + name;
-      return trueOrigin;
-    };
-
-    $scope.getImage = function() {
-      return $rootScope.images.pop().image;
-    };
   })
 ;

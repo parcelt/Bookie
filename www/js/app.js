@@ -26,6 +26,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
     $stateProvider
 
       .state('app', {
+        cache: false,
         url: '/app',
         abstract: true,
         templateUrl: 'templates/menu.html',
@@ -39,6 +40,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.chats', {
+        cache: false,
         url: '/chats',
         views: {
           'menuContent': {
@@ -49,6 +51,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.chatUser', {
+        cache: false,
         url: '/chatUser/:user',
         params: {
           'uid': 'uid_placeholder',
@@ -65,6 +68,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.posts', {
+        cache: false,
         url: '/posts',
         views: {
           'menuContent': {
@@ -75,6 +79,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.editPost', {
+        cache: false,
         url: '/editPost/:key',
         params: {
           'key': "key_placeholder"
@@ -83,6 +88,17 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
           'menuContent': {
             templateUrl: 'templates/editPost.html',
             controller: 'EditPostCtrl'
+          }
+        }
+      })
+
+      .state('app.search', {
+        cache: false,
+        url: '/search',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/search.html',
+            controller: 'SearchCtrl'
           }
         }
       })
@@ -99,6 +115,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.userProfile', {
+        cache: false,
         url: '/userProfile/:uid',
         params: {
           'uid': 'uid_placeholder',
@@ -114,20 +131,8 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
         }
       })
 
-      .state('app.review', {
-        url: '/review/:user',
-        views: {
-          'menuContent': {
-            templateUrl: 'templates/review.html',
-            params: {
-              'user': 'user_placeholder'
-            },
-            controller: 'ReviewCtrl'
-          }
-        }
-      })
-
       .state('app.settings', {
+        cache: false,
         url: '/settings',
         views: {
           'menuContent': {
@@ -138,6 +143,7 @@ angular.module('bookie', ['ionic', 'bookie.controllers', 'ngCordova', 'firebase'
       })
 
       .state('app.home', {
+        cache: false,
         url: '/home',
         views: {
           'menuContent': {

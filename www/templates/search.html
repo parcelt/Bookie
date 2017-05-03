@@ -1,0 +1,40 @@
+<ion-view view-title="Search">
+  <ion-content>
+
+    <div class="bottom" ng-controller="SearchCtrl">
+      <div style="float: left; width: 100%;">
+        <label class="item item-input">
+          <i class="icon ion-search placeholder-icon"></i>
+          <form ng-submit="onSearch()">
+            <input type="text" id="searchBar" name="search" placeholder="Search">
+          </form>
+        </label>
+      </div>
+    </div>
+
+    <div class="chat-message clearfix"  ng-repeat="result in userResults | limitTo: userLimit" ng-click="goToUser(result)" ng-controller="SearchCtrl">
+      <img class="profilePic" src="data:image/jpeg;base64,{{result.photoURL}}" alt="" width="32" height="32">
+      <h5>{{result.displayName}}</h5>
+      <hr>
+    </div>
+    <button class="button button-block button-positive post" ng-click="loadMoreUsers()">Load More Users...</button>
+    <div ng-repeat="result in postResults | orderBy:'-' | limitTo: postLimit" ng-click="goToUser(result)" ng-controller="SearchCtrl">
+      <br>
+      <ion-item class="item-avatar" ng-controller="SearchCtrl" ng-click="goToUser(result)">
+        <img src="data:image/jpeg;base64,{{result.photoURL}}" />
+        <h2>{{result.displayName}}</h2>
+        <p>{{result.time}}</p>
+      </ion-item>
+      <ion-item class="item-body">
+        <p style="color:black;">
+          {{result.message}}
+        </p>
+        <div ng-repeat="image in parseJSON(result.images)">
+          <img class="full-image" ng-src="data:image/jpeg;base64,{{image}}" width="100%" />
+        </div>
+      </ion-item>
+      <br>
+    </div>
+    <button class="button button-block button-positive post" ng-click="loadMorePosts()">Load More Posts...</button>
+  </ion-content>
+</ion-view>
