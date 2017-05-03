@@ -309,13 +309,34 @@ angular.module('bookie.controllers', ['firebase'])
   .controller('SearchCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
     $scope.userLimit = 5;
     $scope.postLimit = 5;
+    var userRef = firebase.database().ref('/user/');
+    $scope.userResults = $firebaseArray(userRef);
+    var postRef = firebase.database().ref('/posts/');
+    $scope.postResults = $firebaseArray(postRef);
+    $scope.searchSubmitted = false;
+
+    $scope.filter = function(result) {
+      return result.displayName.indexOf(queryText) > -1 && $scope.searchSubmitted;
+    };
 
     $scope.onSearch = function() {
-      var queryText = document.getElementById("searchBar").value;
-      var userRef = firebase.database().ref('/user/');
-      $scope.userResults = $firebaseArray(userRef.orderByChild("displayName").startAt(queryText).endAt(queryText + "\uf8ff"));
-      var postRef = firebase.database().ref('/posts/');
-      $scope.postResults = $firebaseArray(postRef.orderByChild("message").startAt(queryText).endAt(queryText + "\uf8ff"));
+      $scope.queryText = document.getElementById("searchBar").value;
+      if($scope.queryText !== "") {
+        $scope.searchSubmitted = true;
+      }
+      else {
+        $scope.searchSubmitted = false;
+      }
+      // var queryText = document.getElementById("searchBar").value;
+      // var userRef = firebase.database().ref('/user/');
+      // var initUserRes = $firebaseArray(userRef);
+      // angular.forEach(initUserRes, function(res) {
+      //   if()
+      //     });
+      // $scope.userResults;
+      // var postRef = firebase.database().ref('/posts/');
+      // var initPostRes = $firebaseArray(postRef.orderByChild("message").startAt(queryText).endAt(queryText + "\uf8ff"));
+      // $scope.postResults
     };
 
     $scope.goToUser = function(result) {
