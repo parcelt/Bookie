@@ -131,6 +131,7 @@ angular.module('bookie.controllers', ['firebase'])
     $scope.convoData = {};
     $scope.chats.$loaded()
       .then(function() {
+        document.getElementById('loaderChats').style.display = 'none';
         angular.forEach($scope.chats, function (chat) {
           firebase.database().ref('/user/' + chat.$id).once('value').then(function(snapshot) {
             $scope.convoData[chat.$id] = {
@@ -195,7 +196,6 @@ angular.module('bookie.controllers', ['firebase'])
 
         console.log("Chat successfully stored");
         textarea.value = "";
-        //$state.go($state.current, {}, {reload: true});
       }
       else {
         alert("Chat box must contain input in order to send.");
@@ -254,7 +254,6 @@ angular.module('bookie.controllers', ['firebase'])
       $rootScope.images = $scope.parseJSON($scope.post.images);
       document.getElementById("editMessage").style.height = 'auto';
       document.getElementById("editMessage").style.height = (this.scrollHeight) + 'px';
-      $state.go($state.current, {}, {reload: true});
     });
 
     $scope.onSaveChanges = function() {
@@ -277,7 +276,6 @@ angular.module('bookie.controllers', ['firebase'])
         $rootScope.images = []; //Reset images array to be empty
         textarea.value = "";
         alert("Success!");
-        $state.go($state.current, {}, {reload: true});
       }
       else {
         alert("Text box must contain input in order to post.");
@@ -453,6 +451,9 @@ angular.module('bookie.controllers', ['firebase'])
     $scope.onSaveChanges = function() {
       var name = document.getElementById("myName-textarea").value;
       var photoURL = $rootScope.images[$rootScope.images.length - 1];
+      if(angular.isUndefined(photoURL)) {
+        photoURL = $rootScope.user.photoURL;
+      }
       $rootScope.user.updateProfile({
         displayName: name,
         photoURL: photoURL
@@ -469,7 +470,6 @@ angular.module('bookie.controllers', ['firebase'])
 
         console.log("Update queued");
         $rootScope.images = []; // Empty images
-        $state.go($state.current, {}, {reload: true});
       }).catch(function(error) {
         alert(error.message);
         console.log(error);
@@ -550,7 +550,6 @@ angular.module('bookie.controllers', ['firebase'])
         textarea.value = "";
         alert("Success!");
         $scope.rating = "0";
-        $state.go($state.current, {}, {reload: true});
       }
       else {
         alert("Text box must contain input in order to submit.");
@@ -631,6 +630,11 @@ angular.module('bookie.controllers', ['firebase'])
 
     var postsRef = firebase.database().ref('/posts/');
     $scope.postsList = $firebaseArray(postsRef);
+    $scope.postsList.$loaded()
+      .then(function() {
+        document.getElementById('loaderHome').style.display = 'none';
+        document.getElementById('loadMoreHome').style.display = 'block';
+      });
     $scope.limit = 5;
     $scope.doPost = function() {
       $rootScope.user = firebase.auth().currentUser;
@@ -655,7 +659,6 @@ angular.module('bookie.controllers', ['firebase'])
         $rootScope.images = []; //Reset images array to be empty
         textarea.value = "";
         alert("Success!");
-        $state.go($state.current, {}, {reload: true});
       }
       else {
         alert("Text box must contain input in order to post.");

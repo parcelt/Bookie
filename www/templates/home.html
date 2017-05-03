@@ -32,6 +32,7 @@
         </ion-scroll>
       </ion-item>
       <br>
+      <div class="loader" id="loaderHome"></div>
       <div ng-repeat="post in postsList | orderBy:'-' | limitTo: limit">
         <br>
         <ion-item class="item-avatar" ng-controller="HomeCtrl" ng-click="goToUser(post)">
@@ -49,7 +50,7 @@
         </ion-item>
         <br>
       </div>
-      <button class="button button-block button-positive post" ng-click="loadMore()">Load More...</button>
+      <button id="loadMoreHome" class="button button-block button-positive load-more" ng-click="loadMore()">Load More...</button>
     </ion-list>
   </ion-content>
 </ion-view>

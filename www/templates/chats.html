@@ -1,6 +1,6 @@
 <ion-view view-title="Chats">
   <ion-content>
-
+    <div class="loader" id="loaderChats"></div>
     <div class="chat-message clearfix"  ng-repeat="chat in chats | orderBy:'-'" ng-click="onSelectChat(chat)" ng-controller="ChatsCtrl">
       <img class="profilePic" src="data:image/jpeg;base64,{{convoData[chat.$id].photoURL}}" alt="" width="32" height="32">
       <div class="chat-message-content clearfix">
