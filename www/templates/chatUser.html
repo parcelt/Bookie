@@ -1,6 +1,6 @@
 <ion-view view-title="Chat With {{displayName}}">
   <div id="live-chat" ng-controller="ChatUserCtrl">
-    <div class="chat-history" schroll-bottom="chatStream">
+    <div class="chat-history" scroll-bottom="chatStream">
       <div class="chat-message clearfix"  ng-repeat="chat in chatStream" ng-if="chat.$id !== 'recent' && chat.$id !== 'time'" ng-click="goToUser(chat)">
         <img class="profilePic" src="data:image/jpeg;base64,{{chat.photoURL}}" alt="" width="32" height="32">
         <div class="chat-message-content clearfix">

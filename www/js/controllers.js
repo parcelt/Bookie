@@ -307,36 +307,41 @@ angular.module('bookie.controllers', ['firebase'])
   })
 
   .controller('SearchCtrl', function($rootScope, $scope, $ionicViewSwitcher, $state, $firebaseArray) {
-    $scope.userLimit = 5;
-    $scope.postLimit = 5;
+    document.getElementById('loaderSearchUser').style.display = 'none';
+    document.getElementById('loaderSearchPosts').style.display = 'none';
+
     var userRef = firebase.database().ref('/user/');
     $scope.userResults = $firebaseArray(userRef);
     var postRef = firebase.database().ref('/posts/');
     $scope.postResults = $firebaseArray(postRef);
     $scope.searchSubmitted = false;
+    $scope.queryText = document.getElementById("searchBar").value;
 
-    $scope.filter = function(result) {
-      return result.displayName.indexOf(queryText) > -1 && $scope.searchSubmitted;
+    $scope.filterUser = function(result) {
+      $scope.queryText = document.getElementById("searchBar").value;
+      $scope.searchSubmitted = ($scope.queryText !== "");
+
+      return result.displayName.includes($scope.queryText) && $scope.searchSubmitted;
+    };
+
+    $scope.filterPosts = function(result) {
+      $scope.queryText = document.getElementById("searchBar").value;
+      $scope.searchSubmitted = ($scope.queryText !== "");
+      return (result.displayName.indexOf($scope.queryText) > -1 || result.message.indexOf($scope.queryText) > -1) && $scope.searchSubmitted;
     };
 
     $scope.onSearch = function() {
-      $scope.queryText = document.getElementById("searchBar").value;
-      if($scope.queryText !== "") {
-        $scope.searchSubmitted = true;
-      }
-      else {
-        $scope.searchSubmitted = false;
-      }
-      // var queryText = document.getElementById("searchBar").value;
-      // var userRef = firebase.database().ref('/user/');
-      // var initUserRes = $firebaseArray(userRef);
-      // angular.forEach(initUserRes, function(res) {
-      //   if()
-      //     });
-      // $scope.userResults;
-      // var postRef = firebase.database().ref('/posts/');
-      // var initPostRes = $firebaseArray(postRef.orderByChild("message").startAt(queryText).endAt(queryText + "\uf8ff"));
-      // $scope.postResults
+      document.getElementById('loaderSearchUser').style.display = 'block';
+      document.getElementById('loaderSearchPosts').style.display = 'block';
+      $scope.userResults.$loaded()
+        .then(function() {
+          document.getElementById('loaderSearchUser').style.display = 'none';
+        });
+
+      $scope.postResults.$loaded()
+        .then(function() {
+          document.getElementById('loaderSearchPosts').style.display = 'none';
+        });
     };
 
     $scope.goToUser = function(result) {
@@ -357,13 +362,6 @@ angular.module('bookie.controllers', ['firebase'])
 
     $scope.parseJSON = function(raw) {
       return JSON.parse(raw);
-    };
-
-    $scope.loadMoreUsers = function() {
-      $scope.userLimit += 5;
-    };
-    $scope.loadMorePosts = function() {
-      $scope.postLimit += 5;
     };
   })
 

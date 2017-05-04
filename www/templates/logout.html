@@ -1,3 +1,4 @@
+<html>
 <ion-modal-view>
   <ion-header-bar>
     <h1 class="title">Logout</h1>
@@ -9,10 +10,11 @@
         <span class="input-label">Are you sure you want to log out?</span>
       </label>
       <div class="buttons">
-        <button class="button button-block button-positive" ng-click="doLogout()">Log Out</button>
-        <button class="button button-block button-positive" ng-click="closeLogout()">Cancel</button>
+        <button id="logout" class="button button-block button-assertive" ng-click="doLogout()">Log Out</button>
+        <button class="button button-block button-negative" ng-click="closeLogout()">Cancel</button>
       </div>
     </div>
 
   </ion-content>
 </ion-modal-view>
+</html>

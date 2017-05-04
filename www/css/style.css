@@ -1,5 +1,5 @@
 textarea {
-  width:210px;
+  width:50vw;
   resize:none;
   overflow:hidden;
   font-size:18px;
@@ -44,6 +44,7 @@ button.post {
   display:block;
   margin-right:0px;
   clear:left;
+  text-align: center;
 }
 #postHeader{
   background-color: lightgray;
@@ -151,7 +152,7 @@ p.message { margin: 0; }
 }
 
 #live-chat form {
-  padding: 24px;
+  padding: 24px, 24px, 24px, 0px;
   bottom: 0;
   position: absolute;
 }
@@ -161,7 +162,7 @@ p.message { margin: 0; }
   border-radius: 3px;
   padding: 8px;
   outline: none;
-  width: 90vw;
+  width: 100vw;
 }
 
 .chat-message-counter {

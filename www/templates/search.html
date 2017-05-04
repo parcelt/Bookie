@@ -12,31 +12,33 @@
       </div>
     </div>
 
-    <div class="chat-message clearfix"  ng-repeat="result in userResults | limitTo: userLimit" ng-click="goToUser(result)" ng-controller="SearchCtrl">
-      <div ng-if="filter(result)">
+    <div class="chat-message clearfix"  ng-repeat="result in userResults" ng-click="goToUser(result)" ng-controller="SearchCtrl">
+      <div ng-if="filterUser(result)" ng-init="userLength = userLength+1">
         <img class="profilePic" src="data:image/jpeg;base64,{{result.photoURL}}" alt="" width="32" height="32">
         <h5>{{result.displayName}}</h5>
         <hr>
       </div>
     </div>
-    <button class="button button-block button-positive post" ng-click="loadMoreUsers()">Load More Users...</button>
-    <div ng-repeat="result in postResults | orderBy:'-' | limitTo: postLimit" ng-if="(result.displayName.indexOf(queryText) > -1 || result.message.includes(queryText)) && searchSubmitted" ng-click="goToUser(result)" ng-controller="SearchCtrl">
-      <br>
-      <ion-item class="item-avatar" ng-controller="SearchCtrl" ng-click="goToUser(result)">
-        <img src="data:image/jpeg;base64,{{result.photoURL}}" />
-        <h2>{{result.displayName}}</h2>
-        <p>{{result.time}}</p>
-      </ion-item>
-      <ion-item class="item-body">
-        <p style="color:black;">
-          {{result.message}}
-        </p>
-        <div ng-repeat="image in parseJSON(result.images)">
-          <img class="full-image" ng-src="data:image/jpeg;base64,{{image}}" width="100%" />
-        </div>
-      </ion-item>
-      <br>
+    <div class="loader" id="loaderSearchUser"></div>
+    <div ng-repeat="result in postResults | orderBy:'-'" ng-click="goToUser(result)" ng-controller="SearchCtrl">
+      <div ng-if="filterPosts(result)" ng-init="postLength = postLength+1">
+        <br>
+        <ion-item class="item-avatar" ng-controller="SearchCtrl" ng-click="goToUser(result)">
+          <img src="data:image/jpeg;base64,{{result.photoURL}}" />
+          <h2>{{result.displayName}}</h2>
+          <p>{{result.time}}</p>
+        </ion-item>
+        <ion-item class="item-body">
+          <p style="color:black;">
+            {{result.message}}
+          </p>
+          <div ng-repeat="image in parseJSON(result.images)">
+            <img class="full-image" ng-src="data:image/jpeg;base64,{{image}}" width="100%" />
+          </div>
+        </ion-item>
+        <br>
+      </div>
     </div>
-    <button class="button button-block button-positive post" ng-click="loadMorePosts()">Load More Posts...</button>
+    <div class="loader" id="loaderSearchPosts"></div>
   </ion-content>
 </ion-view>
